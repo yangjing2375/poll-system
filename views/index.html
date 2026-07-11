@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线投票系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+        }
+        
+        .user-info button {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .user-info button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .main-content {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .welcome-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .welcome-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-card p {
+            color: #666;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .feature-card a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .feature-card a:hover {
+            background: #5a6fd6;
+        }
+        
+        .no-login {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .no-login h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .no-login .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+        
+        .no-login .btn:hover {
+            background: #5a6fd6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>在线投票系统</h1>
+        <div class="user-info" id="userInfo">
+            <span>欢迎, <span id="username"></span></span>
+            <button onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div id="loggedInContent">
+            <div class="welcome-card">
+                <h2>欢迎回来！</h2>
+                <p>您可以创建投票、参与投票或查看投票结果。</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">📝</div>
+                    <h3>创建投票</h3>
+                    <p>创建新的投票主题，设置投票选项和截止时间</p>
+                    <a href="create_poll.html">开始创建</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">🗳️</div>
+                    <h3>参与投票</h3>
+                    <p>浏览所有投票并参与投票</p>
+                    <a href="polls.html">查看投票</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>查看结果</h3>
+                    <p>查看投票统计结果和数据可视化</p>
+                    <a href="results.html">查看结果</a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="notLoggedInContent" style="display: none;">
+            <div class="no-login">
+                <h2>请先登录</h2>
+                <a href="login.html" class="btn">登录</a>
+                <a href="register.html" class="btn">注册</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function checkLogin() {
+            fetch('../api/check_session.php', {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    localStorage.setItem('user', JSON.stringify(data.data));
+                    document.getElementById('username').textContent = data.data.username;
+                    document.getElementById('loggedInContent').style.display = 'block';
+                    document.getElementById('notLoggedInContent').style.display = 'none';
+                } else {
+                    localStorage.removeItem('user');
+                    document.getElementById('loggedInContent').style.display = 'none';
+                    document.getElementById('notLoggedInContent').style.display = 'block';
+                    document.getElementById('userInfo').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                localStorage.removeItem('user');
+                document.getElementById('loggedInContent').style.display = 'none';
+                document.getElementById('notLoggedInContent').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'none';
+            });
+        }
+        
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+        
+        checkLogin();
+    </script>
+</body>
+</html>
