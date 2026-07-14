@@ -113,9 +113,104 @@
 
 ---
 
+### 4. 创建投票
+
+**请求地址**: `POST /api/create_poll.php`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| title | string | 是 | 投票标题 |
+| description | string | 否 | 投票描述 |
+| options | array | 是 | 投票选项数组，至少2个 |
+| is_multiple | int | 否 | 是否多选，0=单选，1=多选，默认0 |
+| max_options | int | 否 | 多选时最多可选数量，默认1 |
+| end_time | string | 否 | 截止时间，格式YYYY-MM-DD HH:MM:SS |
+
+**请求示例**:
+
+```json
+{
+    "title": "你最喜欢的编程语言",
+    "description": "请选择你最喜欢的编程语言",
+    "options": ["Java", "Python", "JavaScript", "Go"],
+    "is_multiple": 0,
+    "max_options": 1
+}
+```
+
+**成功响应**:
+
+```json
+{
+    "success": true,
+    "message": "投票创建成功",
+    "poll_id": 1
+}
+```
+
+**失败响应**:
+
+```json
+{
+    "success": false,
+    "message": "请先登录"
+}
+```
+
+---
+
+### 5. 获取投票列表
+
+**请求地址**: `GET /api/get_polls.php`
+
+**请求参数**: 无
+
+**成功响应**:
+
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "title": "你最喜欢的编程语言",
+            "description": "请选择你最喜欢的编程语言",
+            "is_multiple": 0,
+            "max_options": 1,
+            "is_active": 1,
+            "start_time": "2026-07-14 10:00:00",
+            "end_time": null,
+            "created_at": "2026-07-14 10:00:00",
+            "creator_name": "testuser",
+            "options": [
+                {
+                    "id": 1,
+                    "option_text": "Java",
+                    "vote_count": 5,
+                    "percentage": 33.3
+                }
+            ],
+            "total_votes": 15,
+            "has_voted": false
+        }
+    ]
+}
+```
+
+**失败响应**:
+
+```json
+{
+    "success": false,
+    "message": "获取投票列表失败"
+}
+```
+
+---
+
 ## 待实现接口
 
-- [ ] 创建投票 (`POST /api/create_poll.php`)
-- [ ] 获取投票列表 (`GET /api/get_polls.php`)
 - [ ] 参与投票 (`POST /api/vote.php`)
 - [ ] 查看投票结果 (`GET /api/get_results.php`)
