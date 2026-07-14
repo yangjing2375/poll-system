@@ -176,10 +176,24 @@
             justify-content: space-between;
             align-items: center;
             transition: background 0.3s;
+            cursor: pointer;
         }
 
         .poll-option:hover {
             background: #f8f9fa;
+        }
+
+        .poll-option.selected {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .poll-option input[type="radio"],
+        .poll-option input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
         .poll-option .option-text {
@@ -227,6 +241,32 @@
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
+        }
+
+        .vote-btn {
+            padding: 8px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .vote-btn:hover {
+            background: #5a6fd6;
+        }
+
+        .vote-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .poll-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
         }
 
         .status-active {
@@ -359,7 +399,9 @@
         }
 
         function loadPolls() {
-            fetch('../api/get_polls.php')
+            fetch('../api/get_polls.php', {
+                credentials: 'include'
+            })
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('polls-container');
@@ -370,8 +412,17 @@
 
                     let html = '';
                     data.data.forEach(poll => {
+                        const isEnded = poll.end_time && new Date(poll.end_time) < new Date();
+                        const statusClass = isEnded ? 'status-ended' : 'status-active';
+                        const statusText = isEnded ? '已结束' : '进行中';
+                        
                         const optionsHtml = poll.options.map(opt => `
-                            <div class="poll-option">
+                            <div class="poll-option" onclick="toggleOption(${poll.id}, ${opt.id}, ${poll.is_multiple})">
+                                <input type="${poll.is_multiple ? 'checkbox' : 'radio'}" 
+                                       name="poll-${poll.id}" 
+                                       id="option-${opt.id}"
+                                       ${poll.has_voted ? 'disabled' : ''}
+                                       ${isEnded ? 'disabled' : ''}>
                                 <span class="option-text">${opt.option_text}</span>
                                 <div class="percentage-bar">
                                     <div class="percentage-fill" style="width: ${opt.percentage}%"></div>
@@ -380,12 +431,8 @@
                             </div>
                         `).join('');
 
-                        const isEnded = poll.end_time && new Date(poll.end_time) < new Date();
-                        const statusClass = isEnded ? 'status-ended' : 'status-active';
-                        const statusText = isEnded ? '已结束' : '进行中';
-
                         html += `
-                            <div class="poll-card">
+                            <div class="poll-card" id="poll-${poll.id}">
                                 <h3>${poll.title}</h3>
                                 ${poll.description ? `<p class="description">${poll.description}</p>` : ''}
                                 <div class="meta">
@@ -394,6 +441,12 @@
                                     创建时间: ${poll.created_at}
                                 </div>
                                 <div class="poll-options">${optionsHtml}</div>
+                                <div class="poll-actions">
+                                    ${!poll.has_voted && !isEnded ? `
+                                        <button class="vote-btn" onclick="submitVote(${poll.id})">提交投票</button>
+                                    ` : ''}
+                                    ${poll.has_voted ? `<span style="color: #667eea;">✓ 您已投票</span>` : ''}
+                                </div>
                                 <div class="poll-footer">
                                     <span class="total-votes">总票数: ${poll.total_votes}</span>
                                     <span class="status ${statusClass}">${statusText}</span>
@@ -407,6 +460,69 @@
                 .catch(error => {
                     console.error('Error loading polls:', error);
                 });
+        }
+
+        function toggleOption(pollId, optionId, isMultiple) {
+            const input = document.getElementById(`option-${optionId}`);
+            if (input.disabled) return;
+            
+            if (isMultiple) {
+                input.checked = !input.checked;
+            } else {
+                document.querySelectorAll(`input[name="poll-${pollId}"]`).forEach(el => el.checked = false);
+                input.checked = true;
+            }
+            
+            document.querySelectorAll(`#poll-${pollId} .poll-option`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            if (input.checked) {
+                input.parentElement.classList.add('selected');
+            }
+        }
+
+        function submitVote(pollId) {
+            const selectedOptions = [];
+            document.querySelectorAll(`input[name="poll-${pollId}"]:checked`).forEach(input => {
+                selectedOptions.push(parseInt(input.id.replace('option-', '')));
+            });
+
+            if (selectedOptions.length === 0) {
+                alert('请至少选择一个选项');
+                return;
+            }
+
+            console.log('投票数据:', { poll_id: pollId, option_ids: selectedOptions });
+
+            fetch('../api/vote.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    poll_id: pollId,
+                    option_ids: selectedOptions
+                }),
+                credentials: 'include'
+            })
+            .then(response => {
+                console.log('响应状态:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('响应数据:', data);
+                if (data.status === 'success') {
+                    alert('投票成功！');
+                    loadPolls();
+                } else {
+                    alert('投票失败: ' + (data.message || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting vote:', error);
+                alert('投票失败，请重试');
+            });
         }
         
         function logout() {

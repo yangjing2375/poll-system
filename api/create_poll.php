@@ -1,8 +1,7 @@
 <?php
 session_start();
-header('Content-Type: application/json');
-
 require_once '../config/db.php';
+setCORSHeaders();
 
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => '请先登录']);

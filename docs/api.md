@@ -210,7 +210,46 @@
 
 ---
 
+### 6. 参与投票
+
+**请求地址**: `POST /api/vote.php`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| poll_id | int | 是 | 投票ID |
+| option_ids | array | 是 | 选项ID数组，单选传1个，多选传多个 |
+
+**请求示例**:
+
+```json
+{
+    "poll_id": 1,
+    "option_ids": [1, 3]
+}
+```
+
+**成功响应**:
+
+```json
+{
+    "status": "success",
+    "message": "投票成功"
+}
+```
+
+**失败响应**:
+
+```json
+{
+    "status": "error",
+    "message": "您已参与过此投票"
+}
+```
+
+---
+
 ## 待实现接口
 
-- [ ] 参与投票 (`POST /api/vote.php`)
 - [ ] 查看投票结果 (`GET /api/get_results.php`)

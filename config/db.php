@@ -7,7 +7,15 @@ define('ALLOWED_ORIGIN', 'http://localhost:8080');
 
 function setCORSHeaders() {
     header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
+    
+    $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    
+    if (in_array($origin, ['http://localhost:8080', 'http://poll-system.local:8080'])) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+    } else {
+        header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
+    }
+    
     header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Allow-Credentials: true');
