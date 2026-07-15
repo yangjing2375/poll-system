@@ -1,0 +1,7 @@
+USE poll_system;
+
+ALTER TABLE users 
+ADD COLUMN avatar TEXT DEFAULT NULL,
+ADD COLUMN gender ENUM('male', 'female') DEFAULT NULL,
+ADD COLUMN age INT DEFAULT NULL,
+ADD COLUMN birthday DATE DEFAULT NULL;

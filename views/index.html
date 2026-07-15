@@ -56,6 +56,259 @@
             background: rgba(255,255,255,0.3);
         }
         
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .user-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .user-dropdown-content.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-item.icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 4px 0;
+        }
+        
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .profile-modal.show {
+            display: flex;
+        }
+        
+        .profile-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .profile-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .close-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 3px solid #667eea;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-preview:hover {
+            opacity: 0.8;
+        }
+        
+        .avatar-upload-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .avatar-upload-btn {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .avatar-upload-btn:hover {
+            background: #5a6fd6;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .submit-profile-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .submit-profile-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .profile-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .profile-success {
+            color: #28a745;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
         .main-content {
             padding: 40px;
             max-width: 1200px;
@@ -316,9 +569,30 @@
 <body>
     <div class="header">
         <h1>在线投票系统</h1>
-        <div class="user-info" id="userInfo">
-            <span>欢迎, <span id="username"></span></span>
-            <button onclick="logout()">退出登录</button>
+        <div class="user-info" id="userInfo" style="display: none;">
+            <div class="user-dropdown" onclick="toggleDropdown()">
+                <div class="user-avatar" id="userAvatar">
+                    <img id="avatarImg" src="" alt="" style="display: none;" referrerpolicy="no-referrer">
+                    <span id="avatarText" style="display: none;"></span>
+                </div>
+                <span>欢迎, <span id="username"></span></span>
+                <span style="font-size: 12px;">▼</span>
+                <div class="user-dropdown-content" id="userDropdown">
+                    <div class="dropdown-item" onclick="event.stopPropagation(); openProfile()">
+                        <span class="dropdown-item icon">👤</span>
+                        <span>个人资料</span>
+                    </div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); openChangePassword()">
+                        <span class="dropdown-item icon">🔐</span>
+                        <span>修改密码</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); logout()">
+                        <span class="dropdown-item icon">🚪</span>
+                        <span>退出登录</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -378,8 +652,7 @@
     
     <script>
         function checkLogin() {
-            fetch('../api/check_session.php', {
-                method: 'GET',
+            fetch('../api/get_profile.php', {
                 credentials: 'include'
             })
             .then(response => response.json())
@@ -389,6 +662,22 @@
                     document.getElementById('username').textContent = data.data.username;
                     document.getElementById('loggedInContent').style.display = 'block';
                     document.getElementById('notLoggedInContent').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'flex';
+                    
+                    const avatarImg = document.getElementById('avatarImg');
+                    const avatarText = document.getElementById('avatarText');
+                    
+                    const avatarUrl = '../api/get_avatar.php?user_id=' + data.data.id + '&t=' + Date.now();
+                    
+                    avatarImg.src = avatarUrl;
+                    avatarImg.style.display = 'block';
+                    avatarText.style.display = 'none';
+                    avatarImg.onerror = function() {
+                        avatarImg.style.display = 'none';
+                        avatarText.style.display = 'block';
+                        avatarText.textContent = data.data.username ? data.data.username.charAt(0).toUpperCase() : '?';
+                    };
+                    
                     loadPolls();
                 } else {
                     localStorage.removeItem('user');
@@ -538,6 +827,441 @@
         }
         
         checkLogin();
+
+        let currentUserProfile = {};
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (dropdown && userDropdown && !userDropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function loadUserProfile() {
+            fetch('../api/get_profile.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    currentUserProfile = data.data;
+                    updateAvatar(data.data.avatar, data.data.username);
+                }
+            })
+            .catch(error => {
+                console.error('获取用户资料失败:', error);
+            });
+        }
+
+        function updateAvatar(avatar, username) {
+            const avatarImg = document.getElementById('avatarImg');
+            const avatarText = document.getElementById('avatarText');
+            
+            const userId = currentUserProfile.id || JSON.parse(localStorage.getItem('user') || '{}').id;
+            const avatarUrl = '../api/get_avatar.php?user_id=' + userId + '&t=' + Date.now();
+            
+            avatarImg.src = avatarUrl;
+            avatarImg.style.display = 'block';
+            avatarText.style.display = 'none';
+            avatarImg.onerror = function() {
+                avatarImg.style.display = 'none';
+                avatarText.style.display = 'block';
+                avatarText.textContent = username ? username.charAt(0).toUpperCase() : '?';
+            };
+        }
+
+        function openProfile() {
+            document.getElementById('userDropdown').classList.remove('show');
+            currentAvatarBase64 = '';
+            
+            fetch('../api/get_profile.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const user = data.data;
+                    currentUserProfile = user;
+                    
+                    document.getElementById('profileUsername').value = user.username || '';
+                    document.getElementById('profileEmail').value = user.email || '';
+                    document.getElementById('profileGender').value = user.gender || '';
+                    document.getElementById('profileBirthday').value = user.birthday || '';
+                    calculateAge(user.birthday);
+                    
+                    updateProfileAvatar(user.avatar, user.username);
+                    
+                    document.getElementById('profileModal').classList.add('show');
+                }
+            })
+            .catch(error => {
+                console.error('获取用户资料失败:', error);
+            });
+        }
+
+        function updateProfileAvatar(avatar, username) {
+            const avatarPreview = document.getElementById('profileAvatarPreview');
+            avatarPreview.innerHTML = '';
+            
+            const userId = currentUserProfile.id || JSON.parse(localStorage.getItem('user') || '{}').id;
+            const img = document.createElement('img');
+            img.src = '../api/get_avatar.php?user_id=' + userId + '&t=' + Date.now();
+            img.onerror = function() {
+                avatarPreview.innerHTML = '';
+                avatarPreview.textContent = username ? username.charAt(0).toUpperCase() : '?';
+            };
+            avatarPreview.appendChild(img);
+        }
+
+        function closeProfile() {
+            document.getElementById('profileModal').classList.remove('show');
+        }
+
+        function selectAvatarFile() {
+            document.getElementById('avatarFileInput').click();
+        }
+
+        function calculateAge(birthday) {
+            const ageDisplay = document.getElementById('calculatedAge');
+            if (!birthday) {
+                ageDisplay.textContent = '';
+                return;
+            }
+            
+            const birthDate = new Date(birthday);
+            const today = new Date();
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            if (age < 0) {
+                ageDisplay.textContent = '请选择有效的出生日期';
+            } else {
+                ageDisplay.textContent = '当前年龄：' + age + ' 岁';
+            }
+        }
+
+        let currentAvatarFile = null;
+        let currentAvatarUrl = '';
+        
+        function handleAvatarFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                currentAvatarFile = file;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarPreview = document.getElementById('profileAvatarPreview');
+                    avatarPreview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    avatarPreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                
+                uploadAvatarFile(file);
+            }
+        }
+        
+        function uploadAvatarFile(file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            fetch('../api/upload_avatar.php', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    currentAvatarUrl = data.avatar_url;
+                    document.getElementById('profileSuccess').textContent = '头像上传成功';
+                    document.getElementById('profileSuccess').style.display = 'block';
+                    document.getElementById('profileError').style.display = 'none';
+                    
+                    const avatarPreview = document.getElementById('profileAvatarPreview');
+                    avatarPreview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = '../api/get_avatar.php?user_id=' + currentUserProfile.id + '&t=' + Date.now();
+                    avatarPreview.appendChild(img);
+                    
+                    updateAvatar(null, currentUserProfile.username);
+                } else {
+                    document.getElementById('profileError').textContent = data.message;
+                    document.getElementById('profileError').style.display = 'block';
+                    document.getElementById('profileSuccess').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('头像上传失败:', error);
+                document.getElementById('profileError').textContent = '头像上传失败';
+                document.getElementById('profileError').style.display = 'block';
+            });
+        }
+
+        function submitProfile() {
+            const username = document.getElementById('profileUsername').value;
+            const email = document.getElementById('profileEmail').value;
+            const gender = document.getElementById('profileGender').value;
+            const birthday = document.getElementById('profileBirthday').value;
+            
+            let age = null;
+            if (birthday) {
+                const birthDate = new Date(birthday);
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+            }
+
+            const updateData = {};
+            if (username && username !== currentUserProfile.username) updateData.username = username;
+            if (email && email !== currentUserProfile.email) updateData.email = email;
+            if (gender) updateData.gender = gender;
+            if (birthday) updateData.birthday = birthday;
+            if (age !== null) updateData.age = age;
+
+            if (Object.keys(updateData).length === 0) {
+                document.getElementById('profileError').textContent = '请修改至少一项内容';
+                document.getElementById('profileError').style.display = 'block';
+                return;
+            }
+
+            fetch('../api/update_profile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(updateData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('profileError').style.display = 'none';
+                    document.getElementById('profileSuccess').textContent = data.message;
+                    document.getElementById('profileSuccess').style.display = 'block';
+                    
+                    setTimeout(() => {
+                        closeProfile();
+                        document.getElementById('profileSuccess').style.display = 'none';
+                        
+                        if (updateData.username) {
+                            document.getElementById('username').textContent = updateData.username;
+                        }
+                        if (updateData.avatar) {
+                            updateAvatar(updateData.avatar, updateData.username || currentUserProfile.username);
+                        }
+                    }, 1500);
+                } else {
+                    document.getElementById('profileSuccess').style.display = 'none';
+                    document.getElementById('profileError').textContent = data.message;
+                    document.getElementById('profileError').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('profileSuccess').style.display = 'none';
+                document.getElementById('profileError').textContent = '网络错误，请稍后重试';
+                document.getElementById('profileError').style.display = 'block';
+            });
+        }
+
+        function openChangePassword() {
+            document.getElementById('changePasswordModal').classList.add('show');
+            document.getElementById('changePasswordError').style.display = 'none';
+            document.getElementById('changePasswordSuccess').style.display = 'none';
+            document.getElementById('changeOldPassword').value = '';
+            document.getElementById('changeNewPassword').value = '';
+            document.getElementById('changeConfirmPassword').value = '';
+        }
+
+        function closeChangePassword() {
+            document.getElementById('changePasswordModal').classList.remove('show');
+        }
+
+        function submitChangePassword() {
+            const oldPassword = document.getElementById('changeOldPassword').value;
+            const newPassword = document.getElementById('changeNewPassword').value;
+            const confirmPassword = document.getElementById('changeConfirmPassword').value;
+
+            if (!oldPassword) {
+                document.getElementById('changePasswordError').textContent = '请输入原密码';
+                document.getElementById('changePasswordError').style.display = 'block';
+                return;
+            }
+
+            if (!newPassword) {
+                document.getElementById('changePasswordError').textContent = '请输入新密码';
+                document.getElementById('changePasswordError').style.display = 'block';
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                document.getElementById('changePasswordError').textContent = '新密码长度至少6位';
+                document.getElementById('changePasswordError').style.display = 'block';
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById('changePasswordError').textContent = '两次输入的新密码不一致';
+                document.getElementById('changePasswordError').style.display = 'block';
+                return;
+            }
+
+            fetch('../api/update_profile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    password: newPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('changePasswordError').style.display = 'none';
+                    document.getElementById('changePasswordSuccess').textContent = '密码修改成功';
+                    document.getElementById('changePasswordSuccess').style.display = 'block';
+                    
+                    setTimeout(() => {
+                        closeChangePassword();
+                        document.getElementById('changePasswordSuccess').style.display = 'none';
+                    }, 1500);
+                } else {
+                    document.getElementById('changePasswordSuccess').style.display = 'none';
+                    document.getElementById('changePasswordError').textContent = data.message;
+                    document.getElementById('changePasswordError').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('changePasswordSuccess').style.display = 'none';
+                document.getElementById('changePasswordError').textContent = '网络错误，请稍后重试';
+                document.getElementById('changePasswordError').style.display = 'block';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+            
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal) {
+                profileModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeProfile();
+                    }
+                });
+            }
+            
+            const birthdayInput = document.getElementById('profileBirthday');
+            if (birthdayInput) {
+                birthdayInput.max = new Date().toISOString().split('T')[0];
+                birthdayInput.addEventListener('change', function() {
+                    calculateAge(this.value);
+                });
+            }
+            
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            if (changePasswordModal) {
+                changePasswordModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeChangePassword();
+                    }
+                });
+            }
+        });
     </script>
+
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <div class="profile-modal-header">
+                <h3>个人资料</h3>
+                <button class="close-btn" onclick="closeProfile()">×</button>
+            </div>
+            
+            <div id="profileError" class="profile-error" style="display: none;"></div>
+            <div id="profileSuccess" class="profile-success" style="display: none;"></div>
+            
+            <div class="avatar-section">
+                <div class="avatar-preview" id="profileAvatarPreview" onclick="selectAvatarFile()">
+                    👤
+                </div>
+                <p style="font-size: 13px; color: #666;">点击头像更换</p>
+                <div class="avatar-upload-options">
+                    <button class="avatar-upload-btn" onclick="event.stopPropagation(); selectAvatarFile()">选择图片</button>
+                </div>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFile(event)">
+            </div>
+            
+            <div class="form-group">
+                <label for="profileUsername">昵称</label>
+                <input type="text" id="profileUsername" placeholder="请输入昵称">
+            </div>
+            
+            <div class="form-group">
+                <label for="profileEmail">邮箱</label>
+                <input type="email" id="profileEmail" placeholder="请输入邮箱">
+            </div>
+            
+            
+            
+            <div class="form-group">
+                <label for="profileGender">性别</label>
+                <select id="profileGender">
+                    <option value="">请选择</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="profileBirthday">出生日期</label>
+                <input type="date" id="profileBirthday" max="">
+                <p id="calculatedAge" style="margin-top: 5px; font-size: 13px; color: #666;"></p>
+            </div>
+            
+            <button class="submit-profile-btn" onclick="submitProfile()">保存修改</button>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <div class="profile-modal-header">
+                <h3>修改密码</h3>
+                <button class="close-btn" onclick="closeChangePassword()">×</button>
+            </div>
+            
+            <div id="changePasswordError" class="profile-error" style="display: none;"></div>
+            <div id="changePasswordSuccess" class="profile-success" style="display: none;"></div>
+            
+            <div class="form-group">
+                <label for="changeOldPassword">原密码</label>
+                <input type="password" id="changeOldPassword" placeholder="请输入原密码">
+            </div>
+            
+            <div class="form-group">
+                <label for="changeNewPassword">新密码</label>
+                <input type="password" id="changeNewPassword" placeholder="请输入新密码（至少6位）">
+            </div>
+            
+            <div class="form-group">
+                <label for="changeConfirmPassword">确认新密码</label>
+                <input type="password" id="changeConfirmPassword" placeholder="请再次输入新密码">
+            </div>
+            
+            <button class="submit-profile-btn" onclick="submitChangePassword()">确认修改</button>
+        </div>
+    </div>
 </body>
 </html>

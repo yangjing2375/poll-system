@@ -56,6 +56,83 @@
             background: rgba(255,255,255,0.3);
         }
         
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .user-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .user-dropdown-content.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-item.icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 4px 0;
+        }
+        
         .main-content {
             padding: 40px;
             max-width: 1200px;
@@ -323,8 +400,25 @@
             <button onclick="goHome()" style="padding: 6px 16px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 6px; cursor: pointer; font-size: 14px;">返回首页</button>
         </div>
         <div class="user-info" id="userInfo" style="display: none;">
-            <span id="username"></span>
-            <button onclick="logout()">退出登录</button>
+            <div class="user-dropdown" onclick="toggleDropdown()">
+                <div class="user-avatar" id="userAvatar">
+                    <img id="avatarImg" src="" alt="" style="display: none;">
+                    <span id="avatarText" style="display: none;"></span>
+                </div>
+                <span id="username"></span>
+                <span style="font-size: 12px;">▼</span>
+                <div class="user-dropdown-content" id="userDropdown">
+                    <div class="dropdown-item" onclick="event.stopPropagation(); window.location.href='index.html'">
+                        <span class="dropdown-item icon">🏠</span>
+                        <span>返回首页</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); logout()">
+                        <span class="dropdown-item icon">🚪</span>
+                        <span>退出登录</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -366,8 +460,7 @@
         }
 
         function checkLogin() {
-            fetch('../api/check_session.php', {
-                method: 'GET',
+            fetch('../api/get_profile.php', {
                 credentials: 'include'
             })
             .then(response => response.json())
@@ -376,6 +469,19 @@
                     localStorage.setItem('user', JSON.stringify(data.data));
                     document.getElementById('username').textContent = data.data.username;
                     document.getElementById('userInfo').style.display = 'flex';
+                    
+                    const avatarImg = document.getElementById('avatarImg');
+                    const avatarText = document.getElementById('avatarText');
+                    if (data.data.avatar) {
+                        avatarImg.src = data.data.avatar;
+                        avatarImg.style.display = 'block';
+                        avatarText.style.display = 'none';
+                    } else {
+                        avatarImg.style.display = 'none';
+                        avatarText.style.display = 'block';
+                        avatarText.textContent = data.data.username ? data.data.username.charAt(0).toUpperCase() : '?';
+                    }
+                    
                     loadPolls();
                 } else {
                     localStorage.removeItem('user');
@@ -389,6 +495,21 @@
                 window.location.href = 'login.html';
             });
         }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (dropdown && userDropdown && !userDropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
 
         function logout() {
             fetch('../api/login.php', {
