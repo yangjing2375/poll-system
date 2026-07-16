@@ -56,6 +56,22 @@
             background: rgba(255,255,255,0.3);
         }
         
+        .admin-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+        
+        .admin-btn:hover {
+            background: #45a049;
+        }
+        
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -302,6 +318,12 @@
                 </div>
             </div>
         </div>
+        <div class="user-info" id="guestInfo" style="display: none;">
+            <button onclick="window.location.href='login.html'">👤 未登录</button>
+        </div>
+        <button id="adminBtn" class="admin-btn" style="display: none;" onclick="window.location.href='admin/index.html'">
+            🔧 后台管理
+        </button>
     </header>
 
     <main class="main-content">
@@ -343,17 +365,37 @@
                         avatarText.textContent = data.data.username ? data.data.username.charAt(0).toUpperCase() : '?';
                     }
                     
-                    loadVoteRecords();
+                    fetch('../api/admin_login.php', { credentials: 'include' })
+                    .then(res => res.json())
+                    .then(adminData => {
+                        const adminBtn = document.getElementById('adminBtn');
+                        if (adminData.status === 'success') {
+                            if (adminBtn) {
+                                adminBtn.style.display = 'block';
+                                localStorage.setItem('admin', JSON.stringify(adminData.admin));
+                            }
+                        } else {
+                            if (adminBtn) {
+                                adminBtn.style.display = 'none';
+                                localStorage.removeItem('admin');
+                            }
+                        }
+                        loadVoteRecords();
+                    });
                 } else {
                     localStorage.removeItem('user');
                     document.getElementById('userInfo').style.display = 'none';
-                    window.location.href = 'login.html';
+                    document.getElementById('guestInfo').style.display = 'flex';
+                    const adminBtn = document.getElementById('adminBtn');
+                    if (adminBtn) adminBtn.style.display = 'none';
                 }
             })
             .catch(error => {
                 localStorage.removeItem('user');
                 document.getElementById('userInfo').style.display = 'none';
-                window.location.href = 'login.html';
+                document.getElementById('guestInfo').style.display = 'flex';
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) adminBtn.style.display = 'none';
             });
         }
 
@@ -373,15 +415,27 @@
         });
 
         function logout() {
-            fetch('../api/login.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ action: 'logout' })
-            })
+            if (!confirm('确定要退出登录吗？')) {
+                return;
+            }
+            Promise.all([
+                fetch('../api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ action: 'logout' })
+                }),
+                fetch('../api/admin_login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ action: 'logout' })
+                })
+            ])
             .then(() => {
                 localStorage.removeItem('user');
-                window.location.href = 'login.html';
+                localStorage.removeItem('admin');
+                window.location.href = 'index.html';
             });
         }
 

@@ -56,6 +56,22 @@
             background: rgba(255,255,255,0.3);
         }
         
+        .admin-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+        
+        .admin-btn:hover {
+            background: #45a049;
+        }
+        
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -790,6 +806,9 @@
         <div class="user-info" id="guestInfo" style="display: none;">
             <button onclick="window.location.href='login.html'">👤 未登录</button>
         </div>
+        <button id="adminBtn" class="admin-btn" style="display: none;" onclick="window.location.href='admin/index.html'">
+            🔧 后台管理
+        </button>
     </div>
     
     <div class="main-content">
@@ -887,7 +906,8 @@
                     const avatarImg = document.getElementById('avatarImg');
                     const avatarText = document.getElementById('avatarText');
                     
-                    const avatarUrl = '../api/get_avatar.php?user_id=' + data.data.id + '&t=' + Date.now();
+                    const isAdmin = localStorage.getItem('admin') !== null;
+                    const avatarUrl = '../api/get_avatar.php?user_id=' + data.data.id + '&table=' + (isAdmin ? 'admins' : 'users') + '&t=' + Date.now();
                     
                     avatarImg.src = avatarUrl;
                     avatarImg.style.display = 'block';
@@ -897,6 +917,25 @@
                         avatarText.style.display = 'block';
                         avatarText.textContent = data.data.username ? data.data.username.charAt(0).toUpperCase() : '?';
                     };
+                    
+                    fetch('../api/admin_login.php', {
+                        credentials: 'include'
+                    })
+                    .then(res => res.json())
+                    .then(adminData => {
+                        const adminBtn = document.getElementById('adminBtn');
+                        if (adminData.status === 'success') {
+                            if (adminBtn) {
+                                adminBtn.style.display = 'block';
+                                localStorage.setItem('admin', JSON.stringify(adminData.admin));
+                            }
+                        } else {
+                            if (adminBtn) {
+                                adminBtn.style.display = 'none';
+                                localStorage.removeItem('admin');
+                            }
+                        }
+                    });
                     
                     loadPolls();
                 } else {
@@ -1125,30 +1164,44 @@
             if (!confirm('确定要退出登录吗？')) {
                 return;
             }
-            fetch('../api/login.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ action: 'logout' })
-            })
+            Promise.all([
+                fetch('../api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ action: 'logout' })
+                }),
+                fetch('../api/admin_login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ action: 'logout' })
+                })
+            ])
             .then(() => {
                 localStorage.removeItem('user');
+                localStorage.removeItem('admin');
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('guestInfo').style.display = 'flex';
                 document.getElementById('welcomeCard').style.display = 'none';
                 document.getElementById('featuresSection').style.display = 'block';
                 document.getElementById('userDropdown').classList.remove('show');
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) adminBtn.style.display = 'none';
                 alert('退出登录成功！');
                 loadPolls();
             })
             .catch(error => {
                 console.error('退出登录失败:', error);
                 localStorage.removeItem('user');
+                localStorage.removeItem('admin');
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('guestInfo').style.display = 'flex';
                 document.getElementById('welcomeCard').style.display = 'none';
                 document.getElementById('featuresSection').style.display = 'block';
                 document.getElementById('userDropdown').classList.remove('show');
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) adminBtn.style.display = 'none';
                 alert('退出登录成功！');
                 loadPolls();
             });
@@ -1253,7 +1306,8 @@
             const avatarText = document.getElementById('avatarText');
             
             const userId = currentUserProfile.id || JSON.parse(localStorage.getItem('user') || '{}').id;
-            const avatarUrl = '../api/get_avatar.php?user_id=' + userId + '&t=' + Date.now();
+            const isAdmin = localStorage.getItem('admin') !== null;
+            const avatarUrl = '../api/get_avatar.php?user_id=' + userId + '&table=' + (isAdmin ? 'admins' : 'users') + '&t=' + Date.now();
             
             avatarImg.src = avatarUrl;
             avatarImg.style.display = 'block';
@@ -1299,8 +1353,9 @@
             avatarPreview.innerHTML = '';
             
             const userId = currentUserProfile.id || JSON.parse(localStorage.getItem('user') || '{}').id;
+            const isAdmin = localStorage.getItem('admin') !== null;
             const img = document.createElement('img');
-            img.src = '../api/get_avatar.php?user_id=' + userId + '&t=' + Date.now();
+            img.src = '../api/get_avatar.php?user_id=' + userId + '&table=' + (isAdmin ? 'admins' : 'users') + '&t=' + Date.now();
             img.onerror = function() {
                 avatarPreview.innerHTML = '';
                 avatarPreview.textContent = username ? username.charAt(0).toUpperCase() : '?';
@@ -1381,8 +1436,9 @@
                     
                     const avatarPreview = document.getElementById('profileAvatarPreview');
                     avatarPreview.innerHTML = '';
+                    const isAdmin = localStorage.getItem('admin') !== null;
                     const img = document.createElement('img');
-                    img.src = '../api/get_avatar.php?user_id=' + currentUserProfile.id + '&t=' + Date.now();
+                    img.src = '../api/get_avatar.php?user_id=' + currentUserProfile.id + '&table=' + (isAdmin ? 'admins' : 'users') + '&t=' + Date.now();
                     avatarPreview.appendChild(img);
                     
                     updateAvatar(null, currentUserProfile.username);
@@ -1404,6 +1460,7 @@
             const email = document.getElementById('profileEmail').value;
             const gender = document.getElementById('profileGender').value;
             const birthday = document.getElementById('profileBirthday').value;
+            const isAdmin = localStorage.getItem('admin') !== null;
             
             let age = null;
             if (birthday) {

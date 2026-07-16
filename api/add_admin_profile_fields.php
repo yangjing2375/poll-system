@@ -1,0 +1,18 @@
+<?php
+session_start();
+require_once '../config/db.php';
+$db = getDB();
+
+try {
+    $db->exec("ALTER TABLE admins ADD COLUMN gender VARCHAR(10) DEFAULT NULL");
+    $db->exec("ALTER TABLE admins ADD COLUMN birthday DATE DEFAULT NULL");
+    $db->exec("ALTER TABLE admins ADD COLUMN age INT DEFAULT NULL");
+    echo "字段添加成功！";
+} catch (PDOException $e) {
+    if (strpos($e->getMessage(), 'Duplicate column') !== false) {
+        echo "字段已存在，无需重复添加";
+    } else {
+        echo "添加失败: " . $e->getMessage();
+    }
+}
+?>

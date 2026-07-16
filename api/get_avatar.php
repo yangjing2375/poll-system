@@ -2,6 +2,7 @@
 require_once '../config/db.php';
 
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
+$table = isset($_GET['table']) && in_array($_GET['table'], ['users', 'admins']) ? $_GET['table'] : 'users';
 
 function outputErrorImage($text = '?') {
     header('Content-Type: image/png');
@@ -64,7 +65,7 @@ if (!$user_id) {
 
 try {
     $db = getDB();
-    $stmt = $db->prepare("SELECT avatar, avatar_data FROM users WHERE id = ?");
+    $stmt = $db->prepare("SELECT avatar, avatar_data, username FROM $table WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -104,7 +105,7 @@ try {
         exit;
     }
 
-    outputErrorImage('?');
+    outputErrorImage($user['username'] ? $user['username'][0] : '?');
 } catch (PDOException $e) {
     outputErrorImage('ERR');
 }

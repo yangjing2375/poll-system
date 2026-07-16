@@ -3,12 +3,15 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+
+if (!isset($_SESSION['user_id']) && !$is_admin) {
     echo json_encode(['status' => 'error', 'message' => '请先登录']);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $is_admin ? $_SESSION['admin_id'] : $_SESSION['user_id'];
+$table_name = $is_admin ? 'admins' : 'users';
 
 if (!isset($_FILES['avatar'])) {
     echo json_encode(['status' => 'error', 'message' => '请选择图片']);
@@ -42,10 +45,10 @@ if ($imageData === false) {
 
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$avatarUrl = $protocol . '://' . $host . '/api/get_avatar.php?user_id=' . $user_id;
+$avatarUrl = $protocol . '://' . $host . '/api/get_avatar.php?user_id=' . $user_id . '&table=' . $table_name;
 
 $db = getDB();
-$stmt = $db->prepare("UPDATE users SET avatar_data = ?, avatar = ? WHERE id = ?");
+$stmt = $db->prepare("UPDATE $table_name SET avatar_data = ?, avatar = ? WHERE id = ?");
 $stmt->execute([$imageData, $avatarUrl, $user_id]);
 
 echo json_encode([

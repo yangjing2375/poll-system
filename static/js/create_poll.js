@@ -20,10 +20,28 @@ function checkSession() {
 
 function setupEventListeners() {
     document.getElementById('logout-btn').addEventListener('click', function() {
-        fetch('../api/login.php', { method: 'DELETE' })
-            .then(() => {
-                window.location.href = 'login.html';
-            });
+        if (!confirm('确定要退出登录吗？')) {
+            return;
+        }
+        Promise.all([
+            fetch('../api/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'logout' })
+            }),
+            fetch('../api/admin_login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'logout' })
+            })
+        ])
+        .then(() => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('admin');
+            window.location.href = 'index.html';
+        });
     });
 
     document.getElementById('add-option-btn').addEventListener('click', function() {

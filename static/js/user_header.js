@@ -31,10 +31,30 @@ function loadUserHeader() {
                 `;
                 userInfo.style.display = 'flex';
             }
+            checkAdminStatus();
         }
     })
     .catch(error => {
         console.error('获取用户信息失败:', error);
+    });
+}
+
+function checkAdminStatus() {
+    fetch('../api/admin_login.php', {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const adminBtn = document.getElementById('adminBtn');
+            if (adminBtn) {
+                adminBtn.style.display = 'block';
+                localStorage.setItem('admin', JSON.stringify(data.admin));
+            }
+        }
+    })
+    .catch(error => {
+        console.log('非管理员用户');
     });
 }
 
@@ -54,6 +74,9 @@ document.addEventListener('click', function(e) {
 });
 
 function logout() {
+    if (!confirm('确定要退出登录吗？')) {
+        return;
+    }
     fetch('../api/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +84,16 @@ function logout() {
         body: JSON.stringify({ action: 'logout' })
     })
     .then(() => {
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
+        fetch('../api/admin_login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action: 'logout' })
+        })
+        .then(() => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('admin');
+            window.location.href = 'index.html';
+        });
     });
 }

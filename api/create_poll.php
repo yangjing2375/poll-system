@@ -3,10 +3,12 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) && !isset($_SESSION['admin_id'])) {
     echo json_encode(['success' => false, 'message' => '请先登录']);
     exit;
 }
+
+$creator_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => '方法不支持']);
@@ -43,7 +45,7 @@ try {
         $data['title'],
         $data['description'] ?? '',
         $data['topic'] ?? '',
-        $_SESSION['user_id'],
+        $creator_id,
         $data['is_multiple'] ?? 0,
         $data['max_options'] ?? 1,
         $data['end_time'] ?? null

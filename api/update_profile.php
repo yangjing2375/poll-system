@@ -3,12 +3,15 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+
+if (!isset($_SESSION['user_id']) && !$is_admin) {
     echo json_encode(['status' => 'error', 'message' => '请先登录']);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $is_admin ? $_SESSION['admin_id'] : $_SESSION['user_id'];
+$table_name = $is_admin ? 'admins' : 'users';
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
@@ -22,7 +25,7 @@ $params = [];
 
 try {
     if (isset($data['username']) && !empty($data['username'])) {
-        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND id != ?");
+        $stmt = $db->prepare("SELECT COUNT(*) FROM $table_name WHERE username = ? AND id != ?");
         $stmt->execute([$data['username'], $user_id]);
         if ($stmt->fetchColumn() > 0) {
             echo json_encode(['status' => 'error', 'message' => '用户名已存在']);
@@ -30,7 +33,11 @@ try {
         }
         $updateFields[] = 'username = ?';
         $params[] = $data['username'];
-        $_SESSION['username'] = $data['username'];
+        if ($is_admin) {
+            $_SESSION['admin_username'] = $data['username'];
+        } else {
+            $_SESSION['username'] = $data['username'];
+        }
     }
 
     if (isset($data['email']) && !empty($data['email'])) {
@@ -38,7 +45,7 @@ try {
             echo json_encode(['status' => 'error', 'message' => '无效的邮箱地址']);
             exit;
         }
-        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt = $db->prepare("SELECT COUNT(*) FROM $table_name WHERE email = ? AND id != ?");
         $stmt->execute([$data['email'], $user_id]);
         if ($stmt->fetchColumn() > 0) {
             echo json_encode(['status' => 'error', 'message' => '邮箱已被使用']);
@@ -54,7 +61,7 @@ try {
             exit;
         }
         
-        $stmt = $db->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt = $db->prepare("SELECT password FROM $table_name WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -110,11 +117,12 @@ try {
     }
 
     $params[] = $user_id;
-    $sql = "UPDATE users SET " . implode(', ', $updateFields) . " WHERE id = ?";
+    $sql = "UPDATE $table_name SET " . implode(', ', $updateFields) . " WHERE id = ?";
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
 
-    $stmt = $db->prepare("SELECT id, username, email, avatar, gender, age, birthday FROM users WHERE id = ?");
+    $selectFields = 'id, username, email, avatar, gender, age, birthday';
+    $stmt = $db->prepare("SELECT $selectFields FROM $table_name WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
