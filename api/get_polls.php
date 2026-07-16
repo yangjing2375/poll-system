@@ -5,16 +5,30 @@ setCORSHeaders();
 
 try {
     $db = getDB();
-    $stmt = $db->prepare("
+    
+    $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+    
+    $sql = "
         SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, p.is_active,
                p.start_time, p.end_time, p.created_at,
                u.username as creator_name
         FROM polls p
         JOIN users u ON p.creator_id = u.id
         WHERE p.is_active = 1
-        ORDER BY p.created_at DESC
-    ");
-    $stmt->execute();
+    ";
+    
+    $params = [];
+    
+    if ($keyword) {
+        $sql .= " AND (p.title LIKE ? OR p.description LIKE ?)";
+        $params[] = "%{$keyword}%";
+        $params[] = "%{$keyword}%";
+    }
+    
+    $sql .= " ORDER BY p.created_at DESC";
+    
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
     $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($polls as &$poll) {

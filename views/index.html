@@ -390,6 +390,46 @@
             font-size: 22px;
         }
 
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+        }
+
+        .search-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
         .poll-card {
             background: white;
             border-radius: 12px;
@@ -635,6 +675,10 @@
 
             <div class="polls-section">
                 <h2>🔥 热门投票</h2>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索投票标题或描述...">
+                    <button class="search-btn" onclick="searchPolls()">🔍 搜索</button>
+                </div>
                 <div id="polls-container">
                     <div class="no-polls">暂无投票，快来创建第一个投票吧！</div>
                 </div>
@@ -694,15 +738,19 @@
             });
         }
 
-        function loadPolls() {
-            fetch('../api/get_polls.php', {
+        function loadPolls(keyword = '') {
+            let url = '../api/get_polls.php';
+            if (keyword) {
+                url += '?keyword=' + encodeURIComponent(keyword);
+            }
+            fetch(url, {
                 credentials: 'include'
             })
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('polls-container');
                     if (!data.success || data.data.length === 0) {
-                        container.innerHTML = '<div class="no-polls">暂无投票，快来创建第一个投票吧！</div>';
+                        container.innerHTML = keyword ? '<div class="no-polls">未找到相关投票</div>' : '<div class="no-polls">暂无投票，快来创建第一个投票吧！</div>';
                         return;
                     }
 
@@ -757,6 +805,17 @@
                     console.error('Error loading polls:', error);
                 });
         }
+
+        function searchPolls() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            loadPolls(keyword);
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPolls();
+            }
+        });
 
         function toggleOption(pollId, optionId, isMultiple) {
             const input = document.getElementById(`option-${optionId}`);
