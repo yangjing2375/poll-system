@@ -420,6 +420,9 @@
                 </div>
             </div>
         </div>
+        <div class="user-info" id="guestInfo" style="display: none;">
+            <button onclick="window.location.href='login.html'">👤 未登录</button>
+        </div>
     </header>
 
     <main class="main-content">
@@ -469,6 +472,7 @@
                     localStorage.setItem('user', JSON.stringify(data.data));
                     document.getElementById('username').textContent = data.data.username;
                     document.getElementById('userInfo').style.display = 'flex';
+                    document.getElementById('guestInfo').style.display = 'none';
                     
                     const avatarImg = document.getElementById('avatarImg');
                     const avatarText = document.getElementById('avatarText');
@@ -486,13 +490,15 @@
                 } else {
                     localStorage.removeItem('user');
                     document.getElementById('userInfo').style.display = 'none';
-                    window.location.href = 'login.html';
+                    document.getElementById('guestInfo').style.display = 'flex';
+                    loadPolls();
                 }
             })
             .catch(error => {
                 localStorage.removeItem('user');
                 document.getElementById('userInfo').style.display = 'none';
-                window.location.href = 'login.html';
+                document.getElementById('guestInfo').style.display = 'flex';
+                loadPolls();
             });
         }
 
@@ -512,6 +518,9 @@
         });
 
         function logout() {
+            if (!confirm('确定要退出登录吗？')) {
+                return;
+            }
             fetch('../api/login.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -520,7 +529,7 @@
             })
             .then(() => {
                 localStorage.removeItem('user');
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
         }
 
@@ -623,6 +632,14 @@
         }
 
         function submitVote() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                if (confirm('请先登录才能参与投票，是否跳转到登录页面？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
             const selectedOptions = [];
             document.querySelectorAll(`input[name="poll-${currentPollId}"]:checked`).forEach(input => {
                 selectedOptions.push(parseInt(input.value));

@@ -384,6 +384,21 @@
             background: #5a6fd6;
         }
 
+        .feature-btn {
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .feature-btn:hover {
+            background: #5a6fd6;
+        }
+
         .polls-section h2 {
             color: #333;
             margin-bottom: 20px;
@@ -772,70 +787,68 @@
                 </div>
             </div>
         </div>
+        <div class="user-info" id="guestInfo" style="display: none;">
+            <button onclick="window.location.href='login.html'">👤 未登录</button>
+        </div>
     </div>
     
     <div class="main-content">
-        <div id="loggedInContent">
+        <div id="welcomeCard" style="display: none;">
             <div class="welcome-card">
                 <h2>欢迎回来！</h2>
                 <p>您可以创建投票、参与投票或查看投票结果。</p>
             </div>
+        </div>
             
+        <div id="featuresSection" style="display: none;">
             <div class="features">
                 <div class="feature-card">
                     <div class="icon">📝</div>
                     <h3>创建投票</h3>
                     <p>创建新的投票主题，设置投票选项和截止时间</p>
-                    <a href="create_poll.html">开始创建</a>
+                    <button onclick="handleFeatureClick('create_poll.html')" class="feature-btn">开始创建</button>
                 </div>
                 
                 <div class="feature-card">
                     <div class="icon">🗳️</div>
                     <h3>参与投票</h3>
                     <p>浏览所有投票并参与投票</p>
-                    <a href="vote.html">参与投票</a>
+                    <button onclick="handleFeatureClick('vote.html')" class="feature-btn">参与投票</button>
                 </div>
                 
                 <div class="feature-card">
                     <div class="icon">📊</div>
                     <h3>查看结果</h3>
                     <p>查看投票统计结果和数据可视化</p>
-                    <a href="results.html">查看结果</a>
+                    <button onclick="handleFeatureClick('results.html')" class="feature-btn">查看结果</button>
                 </div>
                 
                 <div class="feature-card">
                     <div class="icon">📋</div>
                     <h3>投票记录</h3>
                     <p>查看我参与的投票以及投票记录</p>
-                    <a href="my_votes.html">查看记录</a>
-                </div>
-            </div>
-
-            <div class="polls-section">
-                <h2>🔥 热门投票</h2>
-                <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput" placeholder="搜索投票标题或描述...">
-                    <button class="search-btn" onclick="searchPolls()">🔍 搜索</button>
-                </div>
-                <div id="polls-container">
-                    <div class="no-polls">暂无投票，快来创建第一个投票吧！</div>
-                </div>
-            </div>
-
-            <div class="topics-section">
-                <h2>📁 专题投票</h2>
-                <div class="topics-grid" id="topics-container">
-                    <div class="loading">加载中...</div>
+                    <button onclick="handleFeatureClick('my_votes.html')" class="feature-btn">查看记录</button>
                 </div>
             </div>
         </div>
-        
-        <div id="notLoggedInContent" style="display: none;">
-            <div class="no-login">
-                <h2>请先登录</h2>
-                <a href="login.html" class="btn">登录</a>
-                <a href="register.html" class="btn">注册</a>
+
+        <div class="polls-section">
+            <h2>🔥 热门投票</h2>
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索投票标题或描述...">
+                <button class="search-btn" onclick="searchPolls()">🔍 搜索</button>
             </div>
+            <div id="polls-container">
+                <div class="no-polls">暂无投票，快来创建第一个投票吧！</div>
+            </div>
+        </div>
+
+        <div class="topics-section">
+            <h2>📁 专题投票</h2>
+            <div class="topics-grid" id="topics-container">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
         </div>
 
         <div class="vote-modal" id="voteModal">
@@ -866,9 +879,10 @@
                 if (data.status === 'success') {
                     localStorage.setItem('user', JSON.stringify(data.data));
                     document.getElementById('username').textContent = data.data.username;
-                    document.getElementById('loggedInContent').style.display = 'block';
-                    document.getElementById('notLoggedInContent').style.display = 'none';
+                    document.getElementById('welcomeCard').style.display = 'block';
+                    document.getElementById('featuresSection').style.display = 'block';
                     document.getElementById('userInfo').style.display = 'flex';
+                    document.getElementById('guestInfo').style.display = 'none';
                     
                     const avatarImg = document.getElementById('avatarImg');
                     const avatarText = document.getElementById('avatarText');
@@ -887,17 +901,32 @@
                     loadPolls();
                 } else {
                     localStorage.removeItem('user');
-                    document.getElementById('loggedInContent').style.display = 'none';
-                    document.getElementById('notLoggedInContent').style.display = 'block';
+                    document.getElementById('welcomeCard').style.display = 'none';
+                    document.getElementById('featuresSection').style.display = 'block';
                     document.getElementById('userInfo').style.display = 'none';
+                    document.getElementById('guestInfo').style.display = 'flex';
+                    loadPolls();
                 }
             })
             .catch(error => {
                 localStorage.removeItem('user');
-                document.getElementById('loggedInContent').style.display = 'none';
-                document.getElementById('notLoggedInContent').style.display = 'block';
+                document.getElementById('welcomeCard').style.display = 'none';
+                document.getElementById('featuresSection').style.display = 'block';
                 document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('guestInfo').style.display = 'flex';
+                loadPolls();
             });
+        }
+
+        function handleFeatureClick(url) {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                if (confirm('请先登录才能使用此功能，是否跳转到登录页面？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            window.location.href = url;
         }
 
         function loadPolls(keyword = '') {
@@ -950,6 +979,13 @@
         }
 
         function searchPolls() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                if (confirm('请先登录才能使用搜索功能，是否跳转到登录页面？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
             const keyword = document.getElementById('searchInput').value.trim();
             loadPolls(keyword);
         }
@@ -986,6 +1022,14 @@
 
         function openVoteModal(pollId, title, description, creator, isMultiple, maxOptions, hasVoted) {
             if (hasVoted) return;
+
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                if (confirm('请先登录才能参与投票，是否跳转到登录页面？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
             
             currentPollId = pollId;
             currentIsMultiple = isMultiple;
@@ -1078,8 +1122,47 @@
         }
         
         function logout() {
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            if (!confirm('确定要退出登录吗？')) {
+                return;
+            }
+            fetch('../api/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'logout' })
+            })
+            .then(() => {
+                localStorage.removeItem('user');
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('guestInfo').style.display = 'flex';
+                document.getElementById('welcomeCard').style.display = 'none';
+                document.getElementById('featuresSection').style.display = 'block';
+                document.getElementById('userDropdown').classList.remove('show');
+                alert('退出登录成功！');
+                loadPolls();
+            })
+            .catch(error => {
+                console.error('退出登录失败:', error);
+                localStorage.removeItem('user');
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('guestInfo').style.display = 'flex';
+                document.getElementById('welcomeCard').style.display = 'none';
+                document.getElementById('featuresSection').style.display = 'block';
+                document.getElementById('userDropdown').classList.remove('show');
+                alert('退出登录成功！');
+                loadPolls();
+            });
+        }
+
+        function handleTopicClick(topic) {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) {
+                if (confirm('请先登录才能查看专题投票，是否跳转到登录页面？')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            window.location.href = 'topic_polls.html?topic=' + topic;
         }
 
         const topicIcons = {
@@ -1114,7 +1197,7 @@
                     const count = topic.participant_count || 0;
                     
                     html += `
-                        <div class="topic-card" onclick="window.location.href='topic_polls.html?topic=${encodeURIComponent(topic.topic)}'">
+                        <div class="topic-card" onclick="handleTopicClick('${encodeURIComponent(topic.topic)}')">
                             <div class="topic-icon">${icon}</div>
                             <div class="topic-info">
                                 <h3>${topic.topic}</h3>
