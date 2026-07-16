@@ -63,6 +63,7 @@ function setupEventListeners() {
         const formData = {
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
+            topic: document.getElementById('topic').value,
             options: options,
             is_multiple: document.getElementById('is_multiple').checked ? 1 : 0,
             max_options: document.getElementById('is_multiple').checked ? parseInt(document.getElementById('max_options').value) : 1,

@@ -38,10 +38,11 @@ try {
     $db = getDB();
     $db->beginTransaction();
     
-    $stmt = $db->prepare("INSERT INTO polls (title, description, creator_id, is_multiple, max_options, end_time) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $data['title'],
         $data['description'] ?? '',
+        $data['topic'] ?? '',
         $_SESSION['user_id'],
         $data['is_multiple'] ?? 0,
         $data['max_options'] ?? 1,

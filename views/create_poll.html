@@ -45,6 +45,21 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+            background: white;
+            cursor: pointer;
+        }
+        select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -74,6 +89,23 @@
                     <div class="form-item">
                         <label for="description">投票描述</label>
                         <textarea id="description" name="description" placeholder="请输入投票描述（可选）" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-item">
+                        <label for="topic">投票专题 *</label>
+                        <select id="topic" name="topic" required>
+                            <option value="">请选择投票专题</option>
+                            <option value="家庭&情感">💗 家庭&情感</option>
+                            <option value="美食专题">🍰 美食专题</option>
+                            <option value="校园专题">🎓 校园专题</option>
+                            <option value="职场专题">💼 职场专题</option>
+                            <option value="影视专题">🎬 影视专题</option>
+                            <option value="运动&出行">🏃 运动&出行</option>
+                            <option value="娱乐专题">🎮 娱乐专题</option>
+                            <option value="旅游专题">✈️ 旅游专题</option>
+                            <option value="汽车专题">🚗 汽车专题</option>
+                            <option value="游戏专题">🎲 游戏专题</option>
+                        </select>
                     </div>
 
                     <div class="form-item">

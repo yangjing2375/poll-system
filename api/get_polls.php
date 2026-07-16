@@ -7,9 +7,10 @@ try {
     $db = getDB();
     
     $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+    $topic = isset($_GET['topic']) ? trim($_GET['topic']) : '';
     
     $sql = "
-        SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, p.is_active,
+        SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active,
                p.start_time, p.end_time, p.created_at,
                u.username as creator_name
         FROM polls p
@@ -18,6 +19,11 @@ try {
     ";
     
     $params = [];
+    
+    if ($topic) {
+        $sql .= " AND p.topic = ?";
+        $params[] = $topic;
+    }
     
     if ($keyword) {
         $sql .= " AND (p.title LIKE ? OR p.description LIKE ?)";

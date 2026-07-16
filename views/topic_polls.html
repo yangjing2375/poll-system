@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专题投票 - 在线投票系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .user-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .user-dropdown-content.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 4px 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .topic-header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .topic-header h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .topic-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .poll-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .poll-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .poll-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .poll-card h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .poll-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .poll-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        
+        .poll-meta span {
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border-radius: 15px;
+            color: #666;
+        }
+        
+        .poll-meta .status-active {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .poll-meta .status-ended {
+            background: #ffebee;
+            color: #f44336;
+        }
+        
+        .poll-meta .voted {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        .poll-card .vote-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        
+        .poll-card .vote-btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        
+        .poll-card .vote-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .no-polls {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: #f0f4ff;
+        }
+
+        .vote-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .vote-modal.show {
+            display: flex;
+        }
+
+        .vote-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .vote-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .vote-modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-poll-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .modal-poll-info p {
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-options {
+            margin-bottom: 20px;
+        }
+
+        .modal-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-option:hover {
+            background: #f8f9fa;
+        }
+
+        .modal-option input[type="radio"],
+        .modal-option input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .modal-option .option-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗳️ 在线投票系统</h1>
+        <div class="user-info" id="userInfo" style="display: none;">
+            <span id="username"></span>
+            <div class="user-dropdown" onclick="toggleDropdown()">
+                <div class="user-avatar">
+                    <img id="avatarImg" style="display: none;">
+                    <span id="avatarText">?</span>
+                </div>
+                <span>▼</span>
+                <div class="user-dropdown-content" id="userDropdown">
+                    <div class="dropdown-item" onclick="event.stopPropagation(); openProfile()">👤 个人资料</div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); openChangePassword()">🔐 修改密码</div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); logout()">🚪 退出登录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← 返回首页</a>
+        
+        <div class="topic-header">
+            <h2 id="topicTitle">专题投票</h2>
+            <p id="topicDescription">在这个专题中，您可以参与相关主题的投票</p>
+        </div>
+
+        <div id="polls-container">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <div class="vote-modal" id="voteModal">
+        <div class="vote-modal-content">
+            <div class="vote-modal-header">
+                <h3 id="modalTitle">投票标题</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-poll-info">
+                <p id="modalDescription"></p>
+                <p id="modalCreator"></p>
+                <p id="modalType"></p>
+            </div>
+            <div class="modal-options" id="modalOptions"></div>
+            <div id="modalError" style="display: none; color: #f44336; margin-bottom: 15px; font-size: 14px;"></div>
+            <button class="vote-btn" id="modalVoteBtn" onclick="submitVoteFromModal()">提交投票</button>
+        </div>
+    </div>
+
+    <script>
+        const topics = {
+            '家庭&情感': { icon: '💗', description: '在恋爱与婚姻的旅程中，当遇到感情难题时，看看网友是如何选择的。' },
+            '美食专题': { icon: '🍰', description: '探索各种美食，分享您的味蕾体验。' },
+            '校园专题': { icon: '🎓', description: '关于校园生活、学习、考试等话题的投票。' },
+            '职场专题': { icon: '💼', description: '职场生存法则、职业发展、工作经验分享。' },
+            '影视专题': { icon: '🎬', description: '电影、电视剧、综艺等影视相关话题。' },
+            '运动&出行': { icon: '🏃', description: '运动健身、旅行出游、户外活动等话题。' },
+            '娱乐专题': { icon: '🎮', description: '游戏、音乐、综艺等娱乐相关话题。' },
+            '旅游专题': { icon: '✈️', description: '探索世界各地的美景，分享旅行心得。' },
+            '汽车专题': { icon: '🚗', description: '汽车品牌、车型选择、驾驶体验等汽车相关话题。' },
+            '游戏专题': { icon: '🎲', description: '电子游戏、手游、电竞等游戏相关话题。' }
+        };
+
+        let currentPollId = 0;
+        let currentIsMultiple = false;
+        let currentMaxOptions = 1;
+
+        function getTopicFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('topic') || '';
+        }
+
+        function checkLogin() {
+            fetch('../api/get_profile.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    localStorage.setItem('user', JSON.stringify(data.data));
+                    document.getElementById('username').textContent = data.data.username;
+                    document.getElementById('userInfo').style.display = 'flex';
+                    
+                    const avatarImg = document.getElementById('avatarImg');
+                    const avatarText = document.getElementById('avatarText');
+                    
+                    const avatarUrl = '../api/get_avatar.php?user_id=' + data.data.id + '&t=' + Date.now();
+                    
+                    avatarImg.src = avatarUrl;
+                    avatarImg.style.display = 'block';
+                    avatarText.style.display = 'none';
+                    avatarImg.onerror = function() {
+                        avatarImg.style.display = 'none';
+                        avatarText.style.display = 'block';
+                        avatarText.textContent = data.data.username ? data.data.username.charAt(0).toUpperCase() : '?';
+                    };
+                    
+                    loadPolls();
+                } else {
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
+        }
+
+        function loadPolls() {
+            const topic = getTopicFromUrl();
+            const topicInfo = topics[topic];
+            
+            if (topic && topicInfo) {
+                document.getElementById('topicTitle').textContent = topicInfo.icon + ' ' + topic;
+                document.getElementById('topicDescription').textContent = topicInfo.description;
+            } else {
+                document.getElementById('topicTitle').textContent = '专题投票';
+                document.getElementById('topicDescription').textContent = '请选择一个专题';
+            }
+
+            let url = '../api/get_polls.php';
+            if (topic) {
+                url += '?topic=' + encodeURIComponent(topic);
+            }
+
+            fetch(url, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('polls-container');
+                if (!data.success || data.data.length === 0) {
+                    container.innerHTML = '<div class="no-polls">该专题暂无投票，快来创建第一个吧！</div>';
+                    return;
+                }
+
+                let html = '<div class="poll-grid">';
+                data.data.forEach(poll => {
+                    const isEnded = poll.end_time && new Date(poll.end_time) < new Date();
+                    const statusClass = isEnded ? 'status-ended' : 'status-active';
+                    const statusText = isEnded ? '已结束' : '进行中';
+                    const voteStatusClass = poll.has_voted ? 'voted' : '';
+                    const voteStatusText = poll.has_voted ? '已投票' : '未投票';
+                    const voteBtnText = poll.has_voted || isEnded ? '已参与' : '去投票';
+                    const voteBtnDisabled = poll.has_voted || isEnded;
+
+                    html += `
+                        <div class="poll-card" onclick="openVoteModal(${poll.id}, '${poll.title.replace(/'/g, "\\'")}', '${poll.description.replace(/'/g, "\\'") || ''}', '${poll.creator_name}', ${poll.is_multiple}, ${poll.max_options}, ${poll.has_voted})">
+                            <h3>${poll.title}</h3>
+                            <p>${poll.description || '暂无描述'}</p>
+                            <div class="poll-meta">
+                                <span>创建者: ${poll.creator_name}</span>
+                                <span>总票数: ${poll.total_votes}</span>
+                                <span class="${statusClass}">${statusText}</span>
+                                ${poll.has_voted ? `<span class="${voteStatusClass}">${voteStatusText}</span>` : ''}
+                            </div>
+                            <button class="vote-btn" ${voteBtnDisabled ? 'disabled' : ''}>${voteBtnText}</button>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                container.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading polls:', error);
+                document.getElementById('polls-container').innerHTML = '<div class="no-polls">加载失败，请稍后重试</div>';
+            });
+        }
+
+        function openVoteModal(pollId, title, description, creator, isMultiple, maxOptions, hasVoted) {
+            if (hasVoted) return;
+            
+            currentPollId = pollId;
+            currentIsMultiple = isMultiple;
+            currentMaxOptions = maxOptions;
+            
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDescription').textContent = description || '暂无描述';
+            document.getElementById('modalCreator').textContent = '创建者: ' + creator;
+            document.getElementById('modalType').textContent = isMultiple ? `多选（最多选${maxOptions}项）` : '单选';
+            document.getElementById('modalError').style.display = 'none';
+            
+            fetch('../api/get_poll_results.php?poll_id=' + pollId, {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.message);
+                    return;
+                }
+                
+                const options = data.data.options;
+                let html = '';
+                
+                options.forEach(option => {
+                    html += `
+                        <div class="modal-option">
+                            <input type="${isMultiple ? 'checkbox' : 'radio'}" 
+                                   name="poll-${pollId}" 
+                                   id="option-${option.id}"
+                                   value="${option.id}">
+                            <span class="option-text">${option.option_text}</span>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('modalOptions').innerHTML = html;
+                document.getElementById('voteModal').classList.add('show');
+            })
+            .catch(error => {
+                console.error('获取投票选项失败:', error);
+                alert('获取投票选项失败');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('voteModal').classList.remove('show');
+        }
+
+        function submitVoteFromModal() {
+            const selectedOptions = [];
+            document.querySelectorAll(`input[name="poll-${currentPollId}"]:checked`).forEach(input => {
+                selectedOptions.push(parseInt(input.value));
+            });
+            
+            if (selectedOptions.length === 0) {
+                document.getElementById('modalError').textContent = '请至少选择一个选项';
+                document.getElementById('modalError').style.display = 'block';
+                return;
+            }
+            
+            if (currentIsMultiple && selectedOptions.length > currentMaxOptions) {
+                document.getElementById('modalError').textContent = `最多只能选择${currentMaxOptions}个选项`;
+                document.getElementById('modalError').style.display = 'block';
+                return;
+            }
+            
+            fetch('../api/vote.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ poll_id: currentPollId, option_ids: selectedOptions }),
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('投票成功！');
+                    closeModal();
+                    loadPolls();
+                } else {
+                    document.getElementById('modalError').textContent = data.message || '投票失败';
+                    document.getElementById('modalError').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('投票失败:', error);
+                document.getElementById('modalError').textContent = '投票失败，请重试';
+                document.getElementById('modalError').style.display = 'block';
+            });
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (dropdown && userDropdown && !userDropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        checkLogin();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+ALTER TABLE polls ADD COLUMN topic VARCHAR(50) DEFAULT NULL AFTER description;
