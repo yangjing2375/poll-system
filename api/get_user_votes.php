@@ -3,12 +3,13 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+if (!isset($_SESSION['user_id']) && !$is_admin) {
     echo json_encode(['success' => false, 'message' => '请先登录']);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $is_admin ? $_SESSION['admin_id'] : $_SESSION['user_id'];
 
 try {
     $db = getDB();

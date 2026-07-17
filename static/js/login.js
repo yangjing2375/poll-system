@@ -38,6 +38,12 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
             
             localStorage.setItem('user', JSON.stringify(data.data));
             
+            if (data.is_admin) {
+                localStorage.setItem('admin', JSON.stringify(data.data));
+            } else {
+                localStorage.removeItem('admin');
+            }
+            
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 2000);

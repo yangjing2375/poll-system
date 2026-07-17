@@ -56,6 +56,8 @@ try {
             $is_admin = true;
             $admin_id = $admin['id'];
             
+            $_SESSION['user_id'] = $admin['id'];
+            $_SESSION['username'] = $admin['username'];
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
             $_SESSION['is_admin'] = true;
