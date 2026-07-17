@@ -40,7 +40,7 @@ try {
     $db = getDB();
     $db->beginTransaction();
     
-    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $data['title'],
         $data['description'] ?? '',
@@ -48,7 +48,8 @@ try {
         $creator_id,
         $data['is_multiple'] ?? 0,
         $data['max_options'] ?? 1,
-        $data['end_time'] ?? null
+        $data['end_time'] ?? null,
+        $data['is_anonymous'] ?? 0
     ]);
     
     $pollId = $db->lastInsertId();

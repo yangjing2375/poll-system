@@ -33,11 +33,11 @@ try {
             $searchParams[] = $status;
         }
 
-        $stmt = $db->prepare("SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.start_time, p.end_time, p.created_at, u.username as creator_name FROM polls p JOIN users u ON p.creator_id = u.id $where ORDER BY p.created_at DESC LIMIT $limit OFFSET $offset");
+        $stmt = $db->prepare("SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.start_time, p.end_time, p.created_at, p.is_anonymous, COALESCE(u.username, a.username, '已删除用户') as creator_name FROM polls p LEFT JOIN users u ON p.creator_id = u.id LEFT JOIN admins a ON p.creator_id = a.id $where ORDER BY p.created_at DESC LIMIT $limit OFFSET $offset");
         $stmt->execute($searchParams);
         $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmt = $db->prepare("SELECT COUNT(*) FROM polls p JOIN users u ON p.creator_id = u.id $where");
+        $stmt = $db->prepare("SELECT COUNT(*) FROM polls p LEFT JOIN users u ON p.creator_id = u.id LEFT JOIN admins a ON p.creator_id = a.id $where");
         $stmt->execute($searchParams);
         $total = $stmt->fetchColumn();
 
@@ -86,17 +86,18 @@ try {
 
                     $db->beginTransaction();
                     
-                    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([
-                        $input['title'],
-                        $input['description'] ?? '',
-                        $input['topic'] ?? '',
-                        $_SESSION['admin_id'],
-                        $input['is_multiple'] ?? 0,
-                        $input['max_options'] ?? 1,
-                        $input['end_time'] ?? null,
-                        $input['is_active'] ?? 1
-                    ]);
+                    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_active, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([
+                            $input['title'],
+                            $input['description'] ?? '',
+                            $input['topic'] ?? '',
+                            $_SESSION['admin_id'],
+                            $input['is_multiple'] ?? 0,
+                            $input['max_options'] ?? 1,
+                            $input['end_time'] ?? null,
+                            $input['is_active'] ?? 1,
+                            $input['is_anonymous'] ?? 0
+                        ]);
                     
                     $pollId = $db->lastInsertId();
                     
@@ -139,7 +140,7 @@ try {
 
                     $db->beginTransaction();
                     
-                    $stmt = $db->prepare("UPDATE polls SET title = ?, description = ?, topic = ?, is_multiple = ?, max_options = ?, end_time = ?, is_active = ? WHERE id = ?");
+                    $stmt = $db->prepare("UPDATE polls SET title = ?, description = ?, topic = ?, is_multiple = ?, max_options = ?, end_time = ?, is_active = ?, is_anonymous = ? WHERE id = ?");
                     $stmt->execute([
                         $input['title'],
                         $input['description'] ?? '',
@@ -148,6 +149,7 @@ try {
                         $input['max_options'] ?? 1,
                         $input['end_time'] ?? null,
                         $input['is_active'] ?? 1,
+                        $input['is_anonymous'] ?? 0,
                         $input['id']
                     ]);
 

@@ -21,7 +21,7 @@ try {
     
     $stmt = $db->prepare("
         SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, 
-               p.start_time, p.end_time, p.is_active,
+               p.start_time, p.end_time, p.is_active, p.is_anonymous,
                COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
         LEFT JOIN users u ON p.creator_id = u.id
@@ -30,6 +30,10 @@ try {
     ");
     $stmt->execute([$poll_id]);
     $poll = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($poll['is_anonymous'] && !$is_admin) {
+        $poll['creator_name'] = '匿名用户';
+    }
     
     if (!$poll) {
         echo json_encode(['success' => false, 'message' => '投票不存在']);

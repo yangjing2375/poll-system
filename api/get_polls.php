@@ -9,9 +9,10 @@ try {
     $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
     $topic = isset($_GET['topic']) ? trim($_GET['topic']) : '';
     
+    $is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
     $sql = "
         SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.is_hot,
-               p.start_time, p.end_time, p.created_at,
+               p.start_time, p.end_time, p.created_at, p.is_anonymous,
                COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
         LEFT JOIN users u ON p.creator_id = u.id
@@ -53,6 +54,10 @@ try {
         
         foreach ($poll['options'] as &$option) {
             $option['percentage'] = $totalVotes > 0 ? round(($option['vote_count'] / $totalVotes) * 100, 1) : 0;
+        }
+        
+        if ($poll['is_anonymous'] && !$is_admin) {
+            $poll['creator_name'] = '匿名用户';
         }
         
         $is_logged_in = (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) || isset($_SESSION['user_id']) && $_SESSION['user_id'];

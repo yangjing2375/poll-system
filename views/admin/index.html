@@ -627,6 +627,12 @@
                         <span style="margin-left: 5px;">启用投票</span>
                     </label>
                 </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; font-weight: bold;">
+                        <input type="checkbox" id="poll-is-anonymous">
+                        <span style="margin-left: 5px;">匿名投票（不显示创建者）</span>
+                    </label>
+                </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="button" onclick="closePollModal()" class="btn btn-info" style="flex: 1;">取消</button>
                     <button type="submit" class="btn btn-primary" style="flex: 1;">保存</button>
@@ -918,6 +924,7 @@
             document.getElementById('poll-max-options').value = '1';
             document.getElementById('poll-end-time').value = '';
             document.getElementById('poll-is-active').checked = true;
+            document.getElementById('poll-is-anonymous').checked = false;
             document.getElementById('poll-options-list').innerHTML = `
                 <input type="text" class="poll-option" placeholder="选项1" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
                 <input type="text" class="poll-option" placeholder="选项2" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
@@ -944,6 +951,7 @@
                     document.getElementById('poll-max-options').value = poll.max_options || '1';
                     document.getElementById('poll-end-time').value = poll.end_time ? poll.end_time.replace(' ', 'T') : '';
                     document.getElementById('poll-is-active').checked = poll.is_active;
+                    document.getElementById('poll-is-anonymous').checked = poll.is_anonymous || false;
                     
                     let optionsHtml = '';
                     poll.options.forEach(opt => {
@@ -986,6 +994,7 @@
                 max_options: parseInt(document.getElementById('poll-max-options').value),
                 end_time: document.getElementById('poll-end-time').value || null,
                 is_active: document.getElementById('poll-is-active').checked ? 1 : 0,
+                is_anonymous: document.getElementById('poll-is-anonymous').checked ? 1 : 0,
                 options: options
             };
 

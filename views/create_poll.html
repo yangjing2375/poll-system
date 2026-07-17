@@ -60,6 +60,48 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px #667eea;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
@@ -69,10 +111,8 @@
                 <h1>🗳️ 在线投票系统</h1>
             </div>
             <nav>
-                <a href="index.html" class="nav-link">首页</a>
-                <a href="create_poll.html" class="nav-link active">创建投票</a>
+                <a href="index.html" class="nav-link">返回首页</a>
                 <span id="user-info" class="nav-link"></span>
-                <button id="logout-btn" class="btn btn-secondary">退出登录</button>
             </nav>
         </header>
 
@@ -127,6 +167,16 @@
                         <label class="checkbox-label">
                             <span>允许多选</span>
                             <input type="checkbox" id="is_multiple" name="is_multiple">
+                        </label>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="checkbox-label">
+                            <span>匿名投票 <span style="font-size: 13px; color: #999;">(开启后不显示创建者)</span></span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="is_anonymous" name="is_anonymous">
+                                <span class="toggle-slider"></span>
+                            </div>
                         </label>
                     </div>
 

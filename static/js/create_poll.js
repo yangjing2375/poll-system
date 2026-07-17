@@ -19,31 +19,6 @@ function checkSession() {
 }
 
 function setupEventListeners() {
-    document.getElementById('logout-btn').addEventListener('click', function() {
-        if (!confirm('确定要退出登录吗？')) {
-            return;
-        }
-        Promise.all([
-            fetch('../api/login.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ action: 'logout' })
-            }),
-            fetch('../api/admin_login.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ action: 'logout' })
-            })
-        ])
-        .then(() => {
-            localStorage.removeItem('user');
-            localStorage.removeItem('admin');
-            window.location.href = 'index.html';
-        });
-    });
-
     document.getElementById('add-option-btn').addEventListener('click', function() {
         const container = document.getElementById('options-container');
         const optionCount = container.querySelectorAll('.option-item').length;
@@ -85,7 +60,8 @@ function setupEventListeners() {
             options: options,
             is_multiple: document.getElementById('is_multiple').checked ? 1 : 0,
             max_options: document.getElementById('is_multiple').checked ? parseInt(document.getElementById('max_options').value) : 1,
-            end_time: document.getElementById('end_time').value || null
+            end_time: document.getElementById('end_time').value || null,
+            is_anonymous: document.getElementById('is_anonymous').checked ? 1 : 0
         };
 
         fetch('../api/create_poll.php', {
