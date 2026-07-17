@@ -28,6 +28,11 @@ if (!isset($data['options']) || !is_array($data['options']) || count($data['opti
 }
 
 $validOptions = array_filter($data['options'], function($opt) {
+    if (is_array($opt)) {
+        $hasText = !empty(trim($opt['text']));
+        $hasImage = !empty($opt['image']);
+        return $hasText || $hasImage;
+    }
     return !empty(trim($opt));
 });
 
@@ -40,23 +45,31 @@ try {
     $db = getDB();
     $db->beginTransaction();
     
-    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([
-        $data['title'],
-        $data['description'] ?? '',
-        $data['topic'] ?? '',
-        $creator_id,
-        $data['is_multiple'] ?? 0,
-        $data['max_options'] ?? 1,
-        $data['end_time'] ?? null,
-        $data['is_anonymous'] ?? 0
-    ]);
+    $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_anonymous, option_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $data['title'],
+            $data['description'] ?? '',
+            $data['topic'] ?? '',
+            $creator_id,
+            $data['is_multiple'] ?? 0,
+            $data['max_options'] ?? 1,
+            $data['end_time'] ?? null,
+            $data['is_anonymous'] ?? 0,
+            $data['option_type'] ?? 'text'
+        ]);
     
     $pollId = $db->lastInsertId();
     
-    $stmt = $db->prepare("INSERT INTO poll_options (poll_id, option_text) VALUES (?, ?)");
+    $stmt = $db->prepare("INSERT INTO poll_options (poll_id, option_text, option_image) VALUES (?, ?, ?)");
     foreach ($validOptions as $option) {
-        $stmt->execute([$pollId, trim($option)]);
+        if (is_array($option)) {
+            $text = !empty(trim($option['text'])) ? trim($option['text']) : '图片选项';
+            $image = $option['image'];
+        } else {
+            $text = trim($option);
+            $image = null;
+        }
+        $stmt->execute([$pollId, $text, $image]);
     }
     
     $db->commit();

@@ -21,7 +21,7 @@ try {
     
     $stmt = $db->prepare("
         SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, 
-               p.start_time, p.end_time, p.is_active, p.is_anonymous,
+               p.start_time, p.end_time, p.is_active, p.is_anonymous, p.option_type,
                COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
         LEFT JOIN users u ON p.creator_id = u.id
@@ -41,7 +41,7 @@ try {
     }
     
     $stmt = $db->prepare("
-        SELECT id, option_text, vote_count
+        SELECT id, option_text, option_image, vote_count
         FROM poll_options
         WHERE poll_id = ?
         ORDER BY vote_count DESC, id ASC

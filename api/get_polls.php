@@ -12,7 +12,7 @@ try {
     $is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
     $sql = "
         SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.is_hot,
-               p.start_time, p.end_time, p.created_at, p.is_anonymous,
+               p.start_time, p.end_time, p.created_at, p.is_anonymous, p.option_type,
                COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
         LEFT JOIN users u ON p.creator_id = u.id
@@ -41,7 +41,7 @@ try {
     
     foreach ($polls as &$poll) {
         $stmt = $db->prepare("
-            SELECT id, option_text, vote_count
+            SELECT id, option_text, option_image, vote_count
             FROM poll_options
             WHERE poll_id = ?
             ORDER BY id ASC

@@ -96,7 +96,7 @@ try {
                 break;
 
             case 'user_ranking':
-                $stmt = $db->prepare("SELECT pv.user_id as id, COALESCE(u.username, a.username, '已删除用户') as username, COALESCE(u.email, a.email, '') as email, COUNT(pv.id) as vote_count, COUNT(DISTINCT pv.poll_id) as poll_count FROM poll_votes pv LEFT JOIN users u ON pv.user_id = u.id LEFT JOIN admins a ON pv.user_id = a.id GROUP BY pv.user_id ORDER BY vote_count DESC LIMIT 10");
+                $stmt = $db->prepare("SELECT pv.user_id as id, COALESCE(u.username, a.username, '已删除用户') as username, COALESCE(u.email, a.email, '') as email, COUNT(pv.id) as vote_count, COUNT(DISTINCT pv.poll_id) as poll_count FROM poll_votes pv LEFT JOIN users u ON pv.user_id = u.id LEFT JOIN admins a ON pv.user_id = a.id GROUP BY pv.user_id ORDER BY poll_count DESC, vote_count DESC LIMIT 10");
                 $stmt->execute();
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
