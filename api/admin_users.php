@@ -36,12 +36,6 @@ try {
 
         foreach ($users as &$user) {
             $user['gender_text'] = $user['gender'] === 'male' ? '男' : ($user['gender'] === 'female' ? '女' : '未设置');
-            $user['is_admin'] = false;
-            $stmt_check = $db->prepare("SELECT id FROM admins WHERE username = ?");
-            $stmt_check->execute([$user['username']]);
-            if ($stmt_check->fetch()) {
-                $user['is_admin'] = true;
-            }
         }
 
         echo json_encode([
@@ -117,39 +111,6 @@ try {
                     $stmt->execute([$input['id']]);
 
                     echo json_encode(['status' => 'success', 'message' => '用户删除成功']);
-                    break;
-
-                case 'set_admin':
-                    if (!isset($input['id']) || !isset($input['is_admin'])) {
-                        echo json_encode(['status' => 'error', 'message' => '缺少参数']);
-                        exit;
-                    }
-
-                    $stmt = $db->prepare("SELECT username, email, password FROM users WHERE id = ?");
-                    $stmt->execute([$input['id']]);
-                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                    if (!$user) {
-                        echo json_encode(['status' => 'error', 'message' => '用户不存在']);
-                        exit;
-                    }
-
-                    if ($input['is_admin']) {
-                        $stmt = $db->prepare("SELECT id FROM admins WHERE username = ?");
-                        $stmt->execute([$user['username']]);
-                        if ($stmt->fetch()) {
-                            echo json_encode(['status' => 'error', 'message' => '该用户已是管理员']);
-                            exit;
-                        }
-
-                        $stmt = $db->prepare("INSERT INTO admins (username, password, email) VALUES (?, ?, ?)");
-                        $stmt->execute([$user['username'], $user['password'], $user['email']]);
-                        echo json_encode(['status' => 'success', 'message' => '已设置为管理员']);
-                    } else {
-                        $stmt = $db->prepare("DELETE FROM admins WHERE username = ?");
-                        $stmt->execute([$user['username']]);
-                        echo json_encode(['status' => 'success', 'message' => '已取消管理员权限']);
-                    }
                     break;
 
                 default:

@@ -96,7 +96,7 @@ try {
                 break;
 
             case 'user_ranking':
-                $stmt = $db->prepare("SELECT pv.user_id as id, COALESCE(a.username, u.username) as username, COALESCE(a.email, u.email) as email, COUNT(pv.id) as vote_count, COUNT(DISTINCT pv.poll_id) as poll_count FROM poll_votes pv LEFT JOIN admins a ON pv.user_id = a.id LEFT JOIN users u ON pv.user_id = u.id GROUP BY pv.user_id ORDER BY vote_count DESC LIMIT 10");
+                $stmt = $db->prepare("SELECT pv.user_id as id, COALESCE(u.username, a.username, '已删除用户') as username, COALESCE(u.email, a.email, '') as email, COUNT(pv.id) as vote_count, COUNT(DISTINCT pv.poll_id) as poll_count FROM poll_votes pv LEFT JOIN users u ON pv.user_id = u.id LEFT JOIN admins a ON pv.user_id = a.id GROUP BY pv.user_id ORDER BY vote_count DESC LIMIT 10");
                 $stmt->execute();
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -104,7 +104,7 @@ try {
                 break;
 
             case 'recent_votes':
-                $stmt = $db->prepare("SELECT pv.id, pv.voted_at, p.title as poll_title, COALESCE(a.username, u.username) as user_name, po.option_text FROM poll_votes pv JOIN polls p ON pv.poll_id = p.id LEFT JOIN admins a ON pv.user_id = a.id LEFT JOIN users u ON pv.user_id = u.id JOIN poll_options po ON pv.option_id = po.id ORDER BY pv.voted_at DESC LIMIT 20");
+                $stmt = $db->prepare("SELECT pv.id, pv.voted_at, p.title as poll_title, COALESCE(u.username, a.username, '已删除用户') as user_name, po.option_text FROM poll_votes pv JOIN polls p ON pv.poll_id = p.id LEFT JOIN users u ON pv.user_id = u.id LEFT JOIN admins a ON pv.user_id = a.id JOIN poll_options po ON pv.option_id = po.id ORDER BY pv.voted_at DESC LIMIT 20");
                 $stmt->execute();
                 $votes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

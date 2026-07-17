@@ -22,10 +22,10 @@ try {
     $stmt = $db->prepare("
         SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, 
                p.start_time, p.end_time, p.is_active,
-               COALESCE(a.username, u.username) as creator_name
+               COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
-        LEFT JOIN admins a ON p.creator_id = a.id
         LEFT JOIN users u ON p.creator_id = u.id
+        LEFT JOIN admins a ON p.creator_id = a.id
         WHERE p.id = ?
     ");
     $stmt->execute([$poll_id]);
@@ -53,11 +53,11 @@ try {
     
     $stmt = $db->prepare("
         SELECT 
-            COALESCE(a.username, u.username) as username, 
+            COALESCE(u.username, a.username, '已删除用户') as username, 
             pv.voted_at, po.option_text
         FROM poll_votes pv
-        LEFT JOIN admins a ON pv.user_id = a.id
         LEFT JOIN users u ON pv.user_id = u.id
+        LEFT JOIN admins a ON pv.user_id = a.id
         JOIN poll_options po ON pv.option_id = po.id
         WHERE pv.poll_id = ?
         ORDER BY pv.voted_at DESC

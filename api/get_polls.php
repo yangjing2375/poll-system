@@ -12,10 +12,10 @@ try {
     $sql = "
         SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.is_hot,
                p.start_time, p.end_time, p.created_at,
-               COALESCE(a.username, u.username) as creator_name
+               COALESCE(u.username, a.username, '已删除用户') as creator_name
         FROM polls p
-        LEFT JOIN admins a ON p.creator_id = a.id
         LEFT JOIN users u ON p.creator_id = u.id
+        LEFT JOIN admins a ON p.creator_id = a.id
         WHERE p.is_active = 1
     ";
     
