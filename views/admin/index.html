@@ -330,9 +330,33 @@
 
             <div id="user-management-page" class="page-content" style="display: none;">
                 <h2 class="page-title">用户管理</h2>
-                <div class="content-card">
-                    <div class="icon">👥</div>
-                    <div class="message">用户管理功能开发中...</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="user-search" placeholder="搜索用户名或邮箱" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                        <button class="btn btn-info" onclick="searchUsers()">搜索</button>
+                        <button class="btn btn-info" onclick="loadUsers()">重置</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddUserModal()">+ 添加用户</button>
+                </div>
+                <div class="table-container">
+                    <table id="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>性别</th>
+                                <th>年龄</th>
+                                <th>注册时间</th>
+                                <th>是否管理员</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;" id="pagination">
                 </div>
             </div>
 
@@ -362,7 +386,49 @@
         </div>
     </div>
 
+    <div id="user-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 8px; padding: 24px; width: 450px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modal-title" style="font-size: 18px; font-weight: bold;">添加用户</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            <form id="user-form">
+                <input type="hidden" id="user-id">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">用户名 *</label>
+                    <input type="text" id="user-username" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">邮箱 *</label>
+                    <input type="email" id="user-email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">密码</label>
+                    <input type="password" id="user-password" placeholder="不修改密码请留空" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">性别</label>
+                    <select id="user-gender" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">年龄</label>
+                    <input type="number" id="user-age" min="0" max="150" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="closeModal()" class="btn btn-info" style="flex: 1;">取消</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        let currentPage = 1;
+
         function switchPage(pageName) {
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
             event.target.classList.add('active');
@@ -378,6 +444,192 @@
                 'statistics': '投票统计'
             };
             document.getElementById('page-title').textContent = titles[pageName];
+
+            if (pageName === 'user-management') {
+                loadUsers();
+            }
+        }
+
+        function loadUsers(page = 1, search = '') {
+            currentPage = page;
+            const baseUrl = window.location.origin;
+            const url = baseUrl + '/api/admin_users.php?page=' + page + '&limit=10' + (search ? '&search=' + encodeURIComponent(search) : '');
+            fetch(url, { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'success') {
+                        alert(data.message);
+                        return;
+                    }
+                    renderUserTable(data.data);
+                    renderPagination(data.total, data.page, data.limit, search);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('加载失败: ' + error.message);
+                });
+        }
+
+        function renderUserTable(users) {
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">暂无数据</td></tr>';
+                return;
+            }
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.gender_text || '未设置'}</td>
+                    <td>${user.age || '-'}</td>
+                    <td>${new Date(user.created_at).toLocaleString('zh-CN')}</td>
+                    <td>${user.is_admin ? '<span style="color: #4CAF50; font-weight: bold;">是</span>' : '否'}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteUser(${user.id})">删除</button>
+                        <button class="btn ${user.is_admin ? 'btn-warning' : 'btn-primary'}" onclick="toggleAdmin(${user.id}, ${!user.is_admin})">
+                            ${user.is_admin ? '取消管理员' : '设为管理员'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderPagination(total, page, limit, search) {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(total / limit);
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (page > 1) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadUsers(${page - 1}, '${search}')">上一页</button>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    pagination.innerHTML += `<button class="btn btn-primary" style="font-weight: bold;">${i}</button>`;
+                } else {
+                    pagination.innerHTML += `<button class="btn btn-info" onclick="loadUsers(${i}, '${search}')">${i}</button>`;
+                }
+            }
+
+            if (page < totalPages) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadUsers(${page + 1}, '${search}')">下一页</button>`;
+            }
+
+            pagination.innerHTML += `<span style="margin-left: 10px; color: #666;">共 ${total} 条记录</span>`;
+        }
+
+        function searchUsers() {
+            const search = document.getElementById('user-search').value;
+            loadUsers(1, search);
+        }
+
+        function showAddUserModal() {
+            document.getElementById('modal-title').textContent = '添加用户';
+            document.getElementById('user-id').value = '';
+            document.getElementById('user-username').value = '';
+            document.getElementById('user-email').value = '';
+            document.getElementById('user-password').value = '';
+            document.getElementById('user-gender').value = '';
+            document.getElementById('user-age').value = '';
+            document.getElementById('user-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('user-modal').style.display = 'none';
+        }
+
+        document.getElementById('user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const data = {
+                action: 'add',
+                username: document.getElementById('user-username').value,
+                email: document.getElementById('user-email').value,
+                password: document.getElementById('user-password').value,
+                gender: document.getElementById('user-gender').value || null,
+                age: document.getElementById('user-age').value || null
+            };
+
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_users.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    closeModal();
+                    loadUsers(currentPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        });
+
+        function deleteUser(id) {
+            if (!confirm('确定要删除该用户吗？删除后将无法恢复！')) {
+                return;
+            }
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_users.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'delete', id: id })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadUsers(currentPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        function toggleAdmin(id, is_admin) {
+            const action = is_admin ? '设为管理员' : '取消管理员权限';
+            if (!confirm(`确定要${action}吗？`)) {
+                return;
+            }
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_users.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'set_admin', id: id, is_admin: is_admin })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadUsers(currentPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
         }
 
         function logout() {
