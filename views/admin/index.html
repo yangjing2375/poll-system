@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -304,27 +305,34 @@
         <div class="content-area">
             <div id="overview-page" class="page-content">
                 <h2 class="page-title">系统概览</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">0</div>
-                        <div class="stat-label">总用户数</div>
+
+                <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                    <div style="background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚙️</span> 系统信息
+                        </h3>
+                        <div id="system-info"></div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value">0</div>
-                        <div class="stat-label">总投票数</div>
+
+                    <div style="background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <span>📈</span> 今日数据概览
+                        </h3>
+                        <div style="display: flex; justify-content: space-around; padding: 20px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="today-users">0</div>
+                                <div style="font-size: 13px; color: #666;">今日注册</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #f5576c;" id="today-polls">0</div>
+                                <div style="font-size: 13px; color: #666;">今日创建</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #4facfe;" id="today-votes">0</div>
+                                <div style="font-size: 13px; color: #666;">今日投票</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value">0</div>
-                        <div class="stat-label">总投票次数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">0</div>
-                        <div class="stat-label">进行中投票</div>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <div class="icon">📊</div>
-                    <div class="message">系统统计数据加载中...</div>
                 </div>
             </div>
 
@@ -477,7 +485,9 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                     <div style="background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
                         <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px;">📈 近7日数据趋势</h3>
-                        <div id="daily-chart" style="height: 200px;"></div>
+                        <div style="height: 220px; overflow: hidden;">
+                            <canvas id="daily-chart"></canvas>
+                        </div>
                     </div>
                     <div style="background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
                         <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px;">🏆 投票热度排行</h3>
@@ -657,6 +667,9 @@
             }
             if (pageName === 'statistics') {
                 loadStatistics();
+            }
+            if (pageName === 'overview') {
+                loadOverview();
             }
         }
 
@@ -1281,8 +1294,53 @@
             });
         }
 
+        function loadOverview() {
+            const baseUrl = window.location.origin;
+
+            fetch(baseUrl + '/api/admin_statistics.php?type=daily_stats&days=1', { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.data.length > 0) {
+                        document.getElementById('today-users').textContent = data.data[0].user_count;
+                        document.getElementById('today-polls').textContent = data.data[0].poll_count;
+                        document.getElementById('today-votes').textContent = data.data[0].vote_count;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            const sysInfoContainer = document.getElementById('system-info');
+            sysInfoContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">系统名称</span>
+                        <span style="font-weight: bold; color: #333;">在线投票系统</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">后端语言</span>
+                        <span style="font-weight: bold; color: #333;">PHP 8.2</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">数据库</span>
+                        <span style="font-weight: bold; color: #333;">MySQL</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">服务器端口</span>
+                        <span style="font-weight: bold; color: #333;">8080</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">当前日期</span>
+                        <span style="font-weight: bold; color: #333;">${new Date().toLocaleDateString('zh-CN')}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">管理员</span>
+                        <span style="font-weight: bold; color: #333;">${localStorage.getItem('admin') || 'admin'}</span>
+                    </div>
+                </div>
+            `;
+        }
+
         function loadStatistics() {
-            loadOverview();
+            loadOverviewData();
             loadDailyStats();
             loadPollRanking();
             loadTopicsStat();
@@ -1290,7 +1348,7 @@
             loadRecentVotes();
         }
 
-        function loadOverview() {
+        function loadOverviewData() {
             const baseUrl = window.location.origin;
             fetch(baseUrl + '/api/admin_statistics.php?type=overview', { credentials: 'include' })
                 .then(response => response.json())
@@ -1320,45 +1378,86 @@
         }
 
         function renderDailyChart(data) {
-            const container = document.getElementById('daily-chart');
+            const ctx = document.getElementById('daily-chart').getContext('2d');
+            
+            if (window.dailyChart) {
+                window.dailyChart.destroy();
+            }
+
             if (data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #999;">暂无数据</div>';
                 return;
             }
 
-            const maxVote = Math.max(...data.map(d => d.vote_count), 1);
-            const maxPoll = Math.max(...data.map(d => d.poll_count), 1);
-            const maxUser = Math.max(...data.map(d => d.user_count), 1);
-            const maxVal = Math.max(maxVote, maxPoll, maxUser);
+            const labels = data.map(d => d.date.slice(5));
+            const voteData = data.map(d => d.vote_count);
+            const pollData = data.map(d => d.poll_count);
+            const userData = data.map(d => d.user_count);
 
-            let html = '<div style="display: flex; align-items: flex-end; justify-content: space-between; height: 100%; padding: 10px;">';
-            
-            data.forEach(item => {
-                const voteHeight = (item.vote_count / maxVal) * 100;
-                const pollHeight = (item.poll_count / maxVal) * 100;
-                const userHeight = (item.user_count / maxVal) * 100;
-                
-                html += `
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; margin: 0 5px;">
-                        <div style="display: flex; align-items: flex-end; gap: 2px; height: 140px;">
-                            <div style="width: 10px; background: #2196F3; border-radius: 2px 2px 0 0;" style="height: ${voteHeight}%;"></div>
-                            <div style="width: 10px; background: #4CAF50; border-radius: 2px 2px 0 0;" style="height: ${pollHeight}%;"></div>
-                            <div style="width: 10px; background: #FF9800; border-radius: 2px 2px 0 0;" style="height: ${userHeight}%;"></div>
-                        </div>
-                        <div style="font-size: 11px; color: #666; margin-top: 8px;">${item.date.slice(5)}</div>
-                        <div style="font-size: 10px; color: #999;">投票:${item.vote_count}</div>
-                    </div>
-                `;
+            window.dailyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '投票数',
+                            data: voteData,
+                            borderColor: '#2196F3',
+                            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '创建数',
+                            data: pollData,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '注册数',
+                            data: userData,
+                            borderColor: '#FF9800',
+                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
             });
-            
-            html += '</div>';
-            html += '<div style="display: flex; gap: 20px; justify-content: center; margin-top: 10px; font-size: 12px;">';
-            html += '<span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; background: #2196F3; border-radius: 2px;"></span>投票数</span>';
-            html += '<span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; background: #4CAF50; border-radius: 2px;"></span>创建数</span>';
-            html += '<span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; background: #FF9800; border-radius: 2px;"></span>注册数</span>';
-            html += '</div>';
-            
-            container.innerHTML = html;
         }
 
         function loadPollRanking() {
@@ -1506,6 +1605,7 @@
             if (admin) {
                 document.getElementById('admin-username').textContent = admin.username;
             }
+            loadOverview();
         });
     </script>
 </body>
