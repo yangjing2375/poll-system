@@ -264,6 +264,262 @@
             color: #666;
             margin-top: 10px;
         }
+        
+        .settings-btn {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.2);
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .settings-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .settings-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 160px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .settings-dropdown-content.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-item.icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        body.dark {
+            background-color: #1a1a2e;
+        }
+        
+        body.dark .sidebar {
+            background: linear-gradient(180deg, #16213e 0%, #0f3460 100%);
+        }
+        
+        body.dark .sidebar-header {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        body.dark .menu-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        body.dark .menu-item.active {
+            background-color: #0f3460;
+        }
+        
+        body.dark .sidebar-footer a {
+            color: #a0a0a0;
+        }
+        
+        body.dark .main-content {
+            background-color: #1a1a2e;
+        }
+        
+        body.dark .header {
+            background-color: #16213e;
+            border-bottom: 1px solid #333;
+        }
+        
+        body.dark .header-title {
+            color: #ffffff;
+        }
+        
+        body.dark .admin-info {
+            color: #a0a0a0;
+        }
+        
+        body.dark .logout-btn {
+            background-color: #c9302c;
+        }
+        
+        body.dark .logout-btn:hover {
+            background-color: #a92521;
+        }
+        
+        body.dark .content-area {
+            background-color: #1a1a2e;
+        }
+        
+        body.dark .page-title {
+            color: #ffffff;
+            border-bottom-color: #0f3460;
+        }
+        
+        body.dark .content-card {
+            background-color: #16213e;
+            color: #a0a0a0;
+        }
+        
+        body.dark .content-card .icon {
+            color: #0f3460;
+        }
+        
+        body.dark table {
+            background-color: #16213e;
+        }
+        
+        body.dark th {
+            background-color: #0f3460;
+            color: #ffffff;
+            border-bottom-color: #333;
+        }
+        
+        body.dark td {
+            color: #a0a0a0;
+            border-bottom-color: #333;
+        }
+        
+        body.dark tr:hover {
+            background-color: #0f3460;
+        }
+        
+        body.dark input[type="text"] {
+            background-color: #0f3460;
+            border-color: #333;
+            color: #ffffff;
+        }
+        
+        body.dark input[type="text"]:focus {
+            border-color: #0f3460;
+        }
+        
+        body.dark select {
+            background-color: #0f3460;
+            border-color: #333;
+            color: #ffffff;
+        }
+        
+        body.dark .btn {
+            border: none;
+        }
+        
+        body.dark .btn-info {
+            background-color: #0f3460;
+        }
+        
+        body.dark .btn-info:hover {
+            background-color: #16213e;
+        }
+        
+        body.dark .btn-primary {
+            background-color: #0f3460;
+        }
+        
+        body.dark .btn-primary:hover {
+            background-color: #16213e;
+        }
+        
+        body.dark .btn-danger {
+            background-color: #c9302c;
+        }
+        
+        body.dark .btn-danger:hover {
+            background-color: #a92521;
+        }
+        
+        body.dark .btn-warning {
+            background-color: #ec971f;
+        }
+        
+        body.dark .stat-card {
+            background-color: #16213e;
+        }
+        
+        body.dark .stat-card .stat-value {
+            color: #0f3460;
+        }
+        
+        body.dark .stat-card .stat-label {
+            color: #a0a0a0;
+        }
+        
+        body.dark #user-modal,
+        body.dark #poll-modal {
+            background: rgba(0,0,0,0.7);
+        }
+        
+        body.dark #user-modal > div,
+        body.dark #poll-modal > div {
+            background: #16213e;
+        }
+        
+        body.dark #modal-title,
+        body.dark #poll-modal-title {
+            color: #ffffff;
+        }
+        
+        body.dark #user-form label,
+        body.dark #poll-form label {
+            color: #ffffff;
+        }
+        
+        body.dark #user-form input,
+        body.dark #poll-form input,
+        body.dark #poll-form textarea,
+        body.dark #poll-form select {
+            background: #0f3460;
+            border-color: #333;
+            color: #ffffff;
+        }
+        
+        body.dark .settings-btn {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            color: #ffffff;
+        }
+        
+        body.dark .settings-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        body.dark .settings-dropdown-content {
+            background: #16213e;
+        }
+        
+        body.dark .dropdown-item {
+            color: #ffffff;
+        }
+        
+        body.dark .dropdown-item:hover {
+            background: #0f3460;
+        }
     </style>
 </head>
 <body>
@@ -297,6 +553,19 @@
         <div class="header">
             <div class="header-title" id="page-title">系统概览</div>
             <div class="header-right">
+                <div class="settings-dropdown">
+                    <button id="settingsBtn" class="settings-btn" onclick="toggleSettings()">⚙️ 设置</button>
+                    <div class="settings-dropdown-content" id="settingsDropdown">
+                        <div class="dropdown-item" onclick="event.stopPropagation(); setTheme('light')">
+                            <span class="dropdown-item icon">☀️</span>
+                            <span>白天模式</span>
+                        </div>
+                        <div class="dropdown-item" onclick="event.stopPropagation(); setTheme('dark')">
+                            <span class="dropdown-item icon">🌙</span>
+                            <span>夜晚模式</span>
+                        </div>
+                    </div>
+                </div>
                 <span class="admin-info">欢迎, <span id="admin-username">admin</span></span>
                 <button class="logout-btn" onclick="logout()">退出登录</button>
             </div>
@@ -644,6 +913,38 @@
     <script>
         let currentPage = 1;
         let pollPage = 1;
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+            }
+        }
+
+        function toggleSettings() {
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+            document.getElementById('settingsDropdown').classList.remove('show');
+        }
+
+        initTheme();
+
+        document.addEventListener('click', function(e) {
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsDropdown && settingsBtn && !settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                settingsDropdown.classList.remove('show');
+            }
+        });
 
         function switchPage(pageName) {
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));

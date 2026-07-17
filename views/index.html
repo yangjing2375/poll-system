@@ -773,11 +773,353 @@
         .no-login .btn:hover {
             background: #5a6fd6;
         }
+        
+        .settings-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .settings-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .settings-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 160px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .settings-dropdown-content.show {
+            display: block;
+        }
+        
+        body.dark {
+            background: #1a1a2e;
+        }
+        
+        body.dark .header {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+        }
+        
+        body.dark .header h1 {
+            color: #ffffff;
+        }
+        
+        body.dark .user-info button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        body.dark .user-info button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        body.dark .user-avatar {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        body.dark .welcome-card {
+            background: #16213e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        body.dark .welcome-card h2 {
+            color: #ffffff;
+        }
+        
+        body.dark .welcome-card p {
+            color: #a0a0a0;
+        }
+        
+        body.dark .feature-card {
+            background: #16213e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        body.dark .feature-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        body.dark .feature-card h3 {
+            color: #ffffff;
+        }
+        
+        body.dark .feature-card p {
+            color: #a0a0a0;
+        }
+        
+        body.dark .feature-card a {
+            background: #0f3460;
+        }
+        
+        body.dark .feature-card a:hover {
+            background: #16213e;
+        }
+        
+        body.dark .feature-btn {
+            background: #0f3460;
+        }
+        
+        body.dark .feature-btn:hover {
+            background: #16213e;
+        }
+        
+        body.dark .poll-card {
+            background: #16213e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        body.dark .poll-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        body.dark .poll-card h3 {
+            color: #ffffff;
+        }
+        
+        body.dark .poll-card p {
+            color: #a0a0a0;
+        }
+        
+        body.dark .poll-meta span {
+            background: #0f3460;
+            color: #a0a0a0;
+        }
+        
+        body.dark .poll-meta .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+        
+        body.dark .poll-meta .status-ended {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        body.dark .poll-meta .voted {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        body.dark .poll-card .vote-btn {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        }
+        
+        body.dark .poll-card .vote-btn:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+        
+        body.dark .poll-card .vote-btn:disabled {
+            background: #333;
+        }
+        
+        body.dark .search-input {
+            background: #16213e;
+            border-color: #333;
+            color: white;
+        }
+        
+        body.dark .search-input:focus {
+            border-color: #0f3460;
+        }
+        
+        body.dark .search-btn {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        }
+        
+        body.dark .topics-section h2 {
+            color: #ffffff;
+        }
+        
+        body.dark .polls-section h2 {
+            color: #ffffff;
+        }
+        
+        body.dark .topic-card {
+            background: #16213e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        body.dark .topic-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        body.dark .topic-info h3 {
+            color: #ffffff;
+        }
+        
+        body.dark .topic-info p {
+            color: #a0a0a0;
+        }
+        
+        body.dark .no-polls {
+            background: #16213e;
+            color: #a0a0a0;
+        }
+        
+        body.dark .vote-modal-content {
+            background: #16213e;
+        }
+        
+        body.dark .vote-modal-header h3 {
+            color: #ffffff;
+        }
+        
+        body.dark .modal-poll-info {
+            background: #0f3460;
+        }
+        
+        body.dark .modal-poll-info p {
+            color: #a0a0a0;
+        }
+        
+        body.dark .modal-option {
+            border-color: #333;
+            background: #0f3460;
+        }
+        
+        body.dark .modal-option:hover {
+            background: #16213e;
+        }
+        
+        body.dark .modal-option .option-text {
+            color: #ffffff;
+        }
+        
+        body.dark .close-btn {
+            background: #333;
+            color: #a0a0a0;
+        }
+        
+        body.dark .close-btn:hover {
+            background: #444;
+        }
+        
+        body.dark .vote-btn {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        }
+        
+        body.dark .vote-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+        }
+        
+        body.dark .user-dropdown-content {
+            background: #16213e;
+        }
+        
+        body.dark .dropdown-item {
+            color: #ffffff;
+        }
+        
+        body.dark .dropdown-item:hover {
+            background: #0f3460;
+        }
+        
+        body.dark .dropdown-divider {
+            background: #333;
+        }
+        
+        body.dark .profile-modal-content {
+            background: #16213e;
+        }
+        
+        body.dark .profile-modal-header h3 {
+            color: #ffffff;
+        }
+        
+        body.dark .form-group label {
+            color: #ffffff;
+        }
+        
+        body.dark .form-group input {
+            background: #0f3460;
+            border-color: #333;
+            color: #ffffff;
+        }
+        
+        body.dark .form-group input:focus {
+            border-color: #0f3460;
+        }
+        
+        body.dark .form-group select {
+            background: #0f3460;
+            border-color: #333;
+            color: #ffffff;
+        }
+        
+        body.dark .form-group select:focus {
+            border-color: #0f3460;
+        }
+        
+        body.dark .submit-profile-btn {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        }
+        
+        body.dark .avatar-preview {
+            background: #0f3460;
+            border-color: #0f3460;
+        }
+        
+        body.dark .avatar-upload-btn {
+            background: #0f3460;
+        }
+        
+        body.dark .avatar-upload-btn:hover {
+            background: #16213e;
+        }
+        
+        body.dark .settings-dropdown-content {
+            background: #16213e;
+        }
+        
+        body.dark .settings-btn {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        body.dark .settings-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>在线投票系统</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <h1>在线投票系统</h1>
+            <div class="settings-dropdown">
+                <button id="settingsBtn" class="settings-btn" onclick="toggleSettings()">⚙️ 设置</button>
+                <div class="settings-dropdown-content" id="settingsDropdown">
+                    <div class="dropdown-item" onclick="event.stopPropagation(); setTheme('light')">
+                        <span class="dropdown-item icon">☀️</span>
+                        <span>白天模式</span>
+                    </div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); setTheme('dark')">
+                        <span class="dropdown-item icon">🌙</span>
+                        <span>夜晚模式</span>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="user-info" id="userInfo" style="display: none;">
             <div class="user-dropdown" onclick="toggleDropdown()">
                 <div class="user-avatar" id="userAvatar">
@@ -1285,6 +1627,29 @@
             });
         }
         
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+            }
+        }
+
+        function toggleSettings() {
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+            document.getElementById('settingsDropdown').classList.remove('show');
+        }
+
+        initTheme();
         checkLogin();
         loadTopicsStats();
 
@@ -1300,6 +1665,12 @@
             const userDropdown = document.querySelector('.user-dropdown');
             if (dropdown && userDropdown && !userDropdown.contains(e.target)) {
                 dropdown.classList.remove('show');
+            }
+            
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsDropdown && settingsBtn && !settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                settingsDropdown.classList.remove('show');
             }
         });
 
