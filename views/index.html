@@ -890,6 +890,20 @@
     
     <script>
         function checkLogin() {
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) {
+                localStorage.removeItem('user');
+                localStorage.removeItem('admin');
+                document.getElementById('welcomeCard').style.display = 'none';
+                document.getElementById('featuresSection').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('guestInfo').style.display = 'flex';
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) adminBtn.style.display = 'none';
+                loadPolls();
+                return;
+            }
+            
             fetch('../api/get_profile.php', {
                 credentials: 'include'
             })
@@ -1172,20 +1186,11 @@
             if (!confirm('确定要退出登录吗？')) {
                 return;
             }
-            Promise.all([
-                fetch('../api/login.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ action: 'logout' })
-                }),
-                fetch('../api/admin_login.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ action: 'logout' })
-                })
-            ])
+            fetch('../api/logout.php', {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(response => response.json())
             .then(() => {
                 localStorage.removeItem('user');
                 localStorage.removeItem('admin');
