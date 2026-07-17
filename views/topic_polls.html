@@ -499,10 +499,11 @@
                     const isEnded = poll.end_time && new Date(poll.end_time) < new Date();
                     const statusClass = isEnded ? 'status-ended' : 'status-active';
                     const statusText = isEnded ? '已结束' : '进行中';
+                    const hasVotedInfo = poll.has_voted !== null;
                     const voteStatusClass = poll.has_voted ? 'voted' : '';
                     const voteStatusText = poll.has_voted ? '已投票' : '未投票';
-                    const voteBtnText = poll.has_voted || isEnded ? '已参与' : '去投票';
-                    const voteBtnDisabled = poll.has_voted || isEnded;
+                    const voteBtnText = (hasVotedInfo && poll.has_voted) || isEnded ? '已参与' : '去投票';
+                    const voteBtnDisabled = (hasVotedInfo && poll.has_voted) || isEnded;
 
                     html += `
                         <div class="poll-card" onclick="openVoteModal(${poll.id}, '${poll.title.replace(/'/g, "\\'")}', '${poll.description.replace(/'/g, "\\'") || ''}', '${poll.creator_name}', ${poll.is_multiple}, ${poll.max_options}, ${poll.has_voted})">
@@ -512,7 +513,7 @@
                                 <span>创建者: ${poll.creator_name}</span>
                                 <span>总票数: ${poll.total_votes}</span>
                                 <span class="${statusClass}">${statusText}</span>
-                                ${poll.has_voted ? `<span class="${voteStatusClass}">${voteStatusText}</span>` : ''}
+                                ${hasVotedInfo ? `<span class="${voteStatusClass}">${voteStatusText}</span>` : ''}
                             </div>
                             <button class="vote-btn" ${voteBtnDisabled ? 'disabled' : ''}>${voteBtnText}</button>
                         </div>
@@ -581,7 +582,8 @@
 
         function submitVoteFromModal() {
             const user = JSON.parse(localStorage.getItem('user') || 'null');
-            if (!user) {
+            const admin = JSON.parse(localStorage.getItem('admin') || 'null');
+            if (!user && !admin) {
                 if (confirm('请先登录才能参与投票，是否跳转到登录页面？')) {
                     window.location.href = 'login.html';
                 }

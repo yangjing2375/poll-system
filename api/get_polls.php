@@ -12,9 +12,10 @@ try {
     $sql = "
         SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.is_hot,
                p.start_time, p.end_time, p.created_at,
-               u.username as creator_name
+               COALESCE(a.username, u.username) as creator_name
         FROM polls p
-        JOIN users u ON p.creator_id = u.id
+        LEFT JOIN admins a ON p.creator_id = a.id
+        LEFT JOIN users u ON p.creator_id = u.id
         WHERE p.is_active = 1
     ";
     
@@ -54,13 +55,15 @@ try {
             $option['percentage'] = $totalVotes > 0 ? round(($option['vote_count'] / $totalVotes) * 100, 1) : 0;
         }
         
-        if (isset($_SESSION['user_id'])) {
+        $is_logged_in = (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) || isset($_SESSION['user_id']) && $_SESSION['user_id'];
+        if ($is_logged_in) {
+            $current_user_id = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] ? $_SESSION['admin_id'] : $_SESSION['user_id'];
             $stmt = $db->prepare("SELECT COUNT(*) as count FROM poll_votes WHERE poll_id = ? AND user_id = ?");
-            $stmt->execute([$poll['id'], $_SESSION['user_id']]);
+            $stmt->execute([$poll['id'], $current_user_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $poll['has_voted'] = $result['count'] > 0;
         } else {
-            $poll['has_voted'] = false;
+            $poll['has_voted'] = null;
         }
     }
     

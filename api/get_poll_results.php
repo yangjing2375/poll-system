@@ -3,7 +3,8 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+if (!isset($_SESSION['user_id']) && !$is_admin) {
     echo json_encode(['success' => false, 'message' => '请先登录']);
     exit;
 }
@@ -21,9 +22,10 @@ try {
     $stmt = $db->prepare("
         SELECT p.id, p.title, p.description, p.is_multiple, p.max_options, 
                p.start_time, p.end_time, p.is_active,
-               u.username as creator_name
+               COALESCE(a.username, u.username) as creator_name
         FROM polls p
-        JOIN users u ON p.creator_id = u.id
+        LEFT JOIN admins a ON p.creator_id = a.id
+        LEFT JOIN users u ON p.creator_id = u.id
         WHERE p.id = ?
     ");
     $stmt->execute([$poll_id]);
@@ -50,9 +52,12 @@ try {
     }
     
     $stmt = $db->prepare("
-        SELECT u.username, pv.voted_at, po.option_text
+        SELECT 
+            COALESCE(a.username, u.username) as username, 
+            pv.voted_at, po.option_text
         FROM poll_votes pv
-        JOIN users u ON pv.user_id = u.id
+        LEFT JOIN admins a ON pv.user_id = a.id
+        LEFT JOIN users u ON pv.user_id = u.id
         JOIN poll_options po ON pv.option_id = po.id
         WHERE pv.poll_id = ?
         ORDER BY pv.voted_at DESC

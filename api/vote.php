@@ -3,10 +3,13 @@ session_start();
 require_once '../config/db.php';
 setCORSHeaders();
 
-if (!isset($_SESSION['user_id'])) {
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
+if (!isset($_SESSION['user_id']) && !$is_admin) {
     echo json_encode(['status' => 'error', 'message' => '请先登录']);
     exit;
 }
+
+$user_id = $is_admin ? $_SESSION['admin_id'] : $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['status' => 'error', 'message' => '请求方法错误']);
@@ -22,7 +25,6 @@ if (!isset($data['poll_id']) || !isset($data['option_ids']) || !is_array($data['
 
 $poll_id = intval($data['poll_id']);
 $option_ids = array_map('intval', $data['option_ids']);
-$user_id = $_SESSION['user_id'];
 
 try {
     $db = getDB();
