@@ -399,10 +399,42 @@
             </div>
 
             <div id="hot-polls-page" class="page-content" style="display: none;">
-                <h2 class="page-title">热门投票</h2>
-                <div class="content-card">
-                    <div class="icon">🔥</div>
-                    <div class="message">热门投票管理功能开发中...</div>
+                <h2 class="page-title">热门投票管理</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="hot-poll-search" placeholder="搜索投票标题" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                        <select id="hot-poll-filter" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="-1">全部状态</option>
+                            <option value="1">热门投票</option>
+                            <option value="0">非热门投票</option>
+                        </select>
+                        <button class="btn btn-info" onclick="searchHotPolls()">搜索</button>
+                        <button class="btn btn-info" onclick="loadHotPolls()">重置</button>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="batchSetHot()">批量设为热门</button>
+                        <button class="btn btn-warning" onclick="batchCancelHot()">批量取消热门</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="hot-poll-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-hot" onclick="toggleSelectAllHot()"></th>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>专题</th>
+                                <th>创建者</th>
+                                <th>投票数</th>
+                                <th>是否热门</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hot-poll-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;" id="hot-pagination">
                 </div>
             </div>
 
@@ -550,6 +582,9 @@
             }
             if (pageName === 'poll-management') {
                 loadPolls();
+            }
+            if (pageName === 'hot-polls') {
+                loadHotPolls();
             }
         }
 
@@ -967,6 +1002,203 @@
                 if (result.status === 'success') {
                     alert(result.message);
                     loadPolls(pollPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        let hotPage = 1;
+        let selectedHotPolls = [];
+
+        function loadHotPolls(page = 1, search = '', isHot = -1) {
+            hotPage = page;
+            selectedHotPolls = [];
+            const baseUrl = window.location.origin;
+            let url = baseUrl + '/api/admin_hot_polls.php?page=' + page + '&limit=10';
+            if (search) url += '&search=' + encodeURIComponent(search);
+            if (isHot >= 0) url += '&is_hot=' + isHot;
+            
+            fetch(url, { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'success') {
+                        alert(data.message);
+                        return;
+                    }
+                    renderHotPollTable(data.data);
+                    renderHotPagination(data.total, data.page, data.limit, search, isHot);
+                    document.getElementById('select-all-hot').checked = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('加载失败: ' + error.message);
+                });
+        }
+
+        function renderHotPollTable(polls) {
+            const tbody = document.getElementById('hot-poll-table-body');
+            tbody.innerHTML = '';
+            if (polls.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">暂无数据</td></tr>';
+                return;
+            }
+            polls.forEach(poll => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="hot-poll-checkbox" value="${poll.id}" onclick="toggleHotPollSelect(${poll.id})"></td>
+                    <td>${poll.id}</td>
+                    <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${poll.title}">${poll.title}</td>
+                    <td>${poll.topic || '-'}</td>
+                    <td>${poll.creator_name}</td>
+                    <td>${poll.total_votes}</td>
+                    <td>${poll.is_hot ? '<span style="color: #f0ad4e; font-weight: bold;">🔥 是</span>' : '否'}</td>
+                    <td>
+                        <button class="btn ${poll.is_hot ? 'btn-warning' : 'btn-primary'}" onclick="toggleHot(${poll.id})">
+                            ${poll.is_hot ? '取消热门' : '设为热门'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderHotPagination(total, page, limit, search, isHot) {
+            const pagination = document.getElementById('hot-pagination');
+            const totalPages = Math.ceil(total / limit);
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (page > 1) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadHotPolls(${page - 1}, '${search}', ${isHot})">上一页</button>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    pagination.innerHTML += `<button class="btn btn-primary" style="font-weight: bold;">${i}</button>`;
+                } else {
+                    pagination.innerHTML += `<button class="btn btn-info" onclick="loadHotPolls(${i}, '${search}', ${isHot})">${i}</button>`;
+                }
+            }
+
+            if (page < totalPages) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadHotPolls(${page + 1}, '${search}', ${isHot})">下一页</button>`;
+            }
+
+            pagination.innerHTML += `<span style="margin-left: 10px; color: #666;">共 ${total} 条记录</span>`;
+        }
+
+        function searchHotPolls() {
+            const search = document.getElementById('hot-poll-search').value;
+            const isHot = parseInt(document.getElementById('hot-poll-filter').value);
+            loadHotPolls(1, search, isHot);
+        }
+
+        function toggleSelectAllHot() {
+            const checkboxes = document.querySelectorAll('.hot-poll-checkbox');
+            const selectAll = document.getElementById('select-all-hot');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+                const id = parseInt(cb.value);
+                if (selectAll.checked) {
+                    if (!selectedHotPolls.includes(id)) {
+                        selectedHotPolls.push(id);
+                    }
+                } else {
+                    selectedHotPolls = selectedHotPolls.filter(item => item !== id);
+                }
+            });
+        }
+
+        function toggleHotPollSelect(id) {
+            const index = selectedHotPolls.indexOf(id);
+            if (index > -1) {
+                selectedHotPolls.splice(index, 1);
+            } else {
+                selectedHotPolls.push(id);
+            }
+            const allChecked = document.querySelectorAll('.hot-poll-checkbox').length === selectedHotPolls.length;
+            document.getElementById('select-all-hot').checked = allChecked;
+        }
+
+        function toggleHot(id) {
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_hot_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'toggle_hot', id: id })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadHotPolls(hotPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        function batchSetHot() {
+            if (selectedHotPolls.length === 0) {
+                alert('请先选择要设为热门的投票');
+                return;
+            }
+            if (!confirm('确定要将选中的投票设为热门吗？')) {
+                return;
+            }
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_hot_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'batch_set_hot', ids: selectedHotPolls })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadHotPolls(hotPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        function batchCancelHot() {
+            if (selectedHotPolls.length === 0) {
+                alert('请先选择要取消热门的投票');
+                return;
+            }
+            if (!confirm('确定要取消选中投票的热门状态吗？')) {
+                return;
+            }
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_hot_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'batch_cancel_hot', ids: selectedHotPolls })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadHotPolls(hotPage);
                 } else {
                     alert(result.message);
                 }

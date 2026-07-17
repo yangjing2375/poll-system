@@ -984,8 +984,15 @@
                         return;
                     }
 
+                    const hotPolls = data.data.filter(poll => poll.is_hot == 1);
+                    
+                    if (hotPolls.length === 0) {
+                        container.innerHTML = '<div class="no-polls">暂无热门投票</div>';
+                        return;
+                    }
+
                     let html = '<div class="poll-grid">';
-                    data.data.forEach(poll => {
+                    hotPolls.forEach(poll => {
                         const isEnded = poll.end_time && new Date(poll.end_time) < new Date();
                         const statusClass = isEnded ? 'status-ended' : 'status-active';
                         const statusText = isEnded ? '已结束' : '进行中';
@@ -999,6 +1006,7 @@
                                 <h3>${poll.title}</h3>
                                 <p>${poll.description || '暂无描述'}</p>
                                 <div class="poll-meta">
+                                    <span>🔥 热门</span>
                                     <span>创建者: ${poll.creator_name}</span>
                                     <span>总票数: ${poll.total_votes}</span>
                                     <span class="${statusClass}">${statusText}</span>

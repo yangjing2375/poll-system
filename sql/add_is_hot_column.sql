@@ -1,0 +1,1 @@
+ALTER TABLE polls ADD COLUMN is_hot TINYINT(1) DEFAULT 0 AFTER is_active;

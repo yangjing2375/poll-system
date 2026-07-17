@@ -10,7 +10,7 @@ try {
     $topic = isset($_GET['topic']) ? trim($_GET['topic']) : '';
     
     $sql = "
-        SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active,
+        SELECT p.id, p.title, p.description, p.topic, p.is_multiple, p.max_options, p.is_active, p.is_hot,
                p.start_time, p.end_time, p.created_at,
                u.username as creator_name
         FROM polls p
@@ -31,7 +31,7 @@ try {
         $params[] = "%{$keyword}%";
     }
     
-    $sql .= " ORDER BY p.created_at DESC";
+    $sql .= " ORDER BY p.is_hot DESC, p.created_at DESC";
     
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
