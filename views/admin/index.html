@@ -362,9 +362,39 @@
 
             <div id="poll-management-page" class="page-content" style="display: none;">
                 <h2 class="page-title">投票管理</h2>
-                <div class="content-card">
-                    <div class="icon">📝</div>
-                    <div class="message">投票管理功能开发中...</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="poll-search" placeholder="搜索投票标题" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                        <select id="poll-status" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="-1">全部状态</option>
+                            <option value="1">进行中</option>
+                            <option value="0">已禁用</option>
+                        </select>
+                        <button class="btn btn-info" onclick="searchPolls()">搜索</button>
+                        <button class="btn btn-info" onclick="loadPolls()">重置</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddPollModal()">+ 创建投票</button>
+                </div>
+                <div class="table-container">
+                    <table id="poll-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>专题</th>
+                                <th>创建者</th>
+                                <th>投票数</th>
+                                <th>类型</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poll-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;" id="poll-pagination">
                 </div>
             </div>
 
@@ -426,8 +456,78 @@
         </div>
     </div>
 
+    <div id="poll-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 8px; padding: 24px; width: 550px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="poll-modal-title" style="font-size: 18px; font-weight: bold;">创建投票</h3>
+                <button onclick="closePollModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            <form id="poll-form">
+                <input type="hidden" id="poll-id">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">投票标题 *</label>
+                    <input type="text" id="poll-title" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">投票描述</label>
+                    <textarea id="poll-description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">专题</label>
+                    <select id="poll-topic" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">请选择专题</option>
+                        <option value="家庭&情感">家庭&情感</option>
+                        <option value="美食专题">美食专题</option>
+                        <option value="校园专题">校园专题</option>
+                        <option value="职场专题">职场专题</option>
+                        <option value="影视专题">影视专题</option>
+                        <option value="运动&出行">运动&出行</option>
+                        <option value="娱乐专题">娱乐专题</option>
+                        <option value="旅游专题">旅游专题</option>
+                        <option value="汽车专题">汽车专题</option>
+                        <option value="游戏专题">游戏专题</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">投票类型</label>
+                    <select id="poll-type" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="0">单选</option>
+                        <option value="1">多选</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">最大可选数量（多选时）</label>
+                    <input type="number" id="poll-max-options" min="1" value="1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">截止时间</label>
+                    <input type="datetime-local" id="poll-end-time" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">投票选项 *</label>
+                    <div id="poll-options-list">
+                        <input type="text" class="poll-option" placeholder="选项1" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
+                        <input type="text" class="poll-option" placeholder="选项2" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
+                    </div>
+                    <button type="button" onclick="addPollOption()" class="btn btn-info" style="margin-top: 5px;">+ 添加选项</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; font-weight: bold;">
+                        <input type="checkbox" id="poll-is-active" checked>
+                        <span style="margin-left: 5px;">启用投票</span>
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="closePollModal()" class="btn btn-info" style="flex: 1;">取消</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         let currentPage = 1;
+        let pollPage = 1;
 
         function switchPage(pageName) {
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
@@ -447,6 +547,9 @@
 
             if (pageName === 'user-management') {
                 loadUsers();
+            }
+            if (pageName === 'poll-management') {
+                loadPolls();
             }
         }
 
@@ -622,6 +725,248 @@
                 if (result.status === 'success') {
                     alert(result.message);
                     loadUsers(currentPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        function loadPolls(page = 1, search = '', status = -1) {
+            pollPage = page;
+            const baseUrl = window.location.origin;
+            let url = baseUrl + '/api/admin_polls.php?page=' + page + '&limit=10';
+            if (search) url += '&search=' + encodeURIComponent(search);
+            if (status >= 0) url += '&status=' + status;
+            
+            fetch(url, { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'success') {
+                        alert(data.message);
+                        return;
+                    }
+                    renderPollTable(data.data);
+                    renderPollPagination(data.total, data.page, data.limit, search, status);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('加载失败: ' + error.message);
+                });
+        }
+
+        function renderPollTable(polls) {
+            const tbody = document.getElementById('poll-table-body');
+            tbody.innerHTML = '';
+            if (polls.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">暂无数据</td></tr>';
+                return;
+            }
+            polls.forEach(poll => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${poll.id}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${poll.title}">${poll.title}</td>
+                    <td>${poll.topic || '-'}</td>
+                    <td>${poll.creator_name}</td>
+                    <td>${poll.total_votes}</td>
+                    <td>${poll.is_multiple ? '多选' : '单选'}</td>
+                    <td>${poll.is_active ? '<span style="color: #4CAF50; font-weight: bold;">进行中</span>' : '<span style="color: #999;">已禁用</span>'}</td>
+                    <td>${new Date(poll.created_at).toLocaleString('zh-CN')}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="showEditPollModal(${poll.id})">编辑</button>
+                        <button class="btn btn-danger" onclick="deletePoll(${poll.id})">删除</button>
+                        <button class="btn ${poll.is_active ? 'btn-warning' : 'btn-primary'}" onclick="togglePollActive(${poll.id})">
+                            ${poll.is_active ? '禁用' : '启用'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderPollPagination(total, page, limit, search, status) {
+            const pagination = document.getElementById('poll-pagination');
+            const totalPages = Math.ceil(total / limit);
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (page > 1) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadPolls(${page - 1}, '${search}', ${status})">上一页</button>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    pagination.innerHTML += `<button class="btn btn-primary" style="font-weight: bold;">${i}</button>`;
+                } else {
+                    pagination.innerHTML += `<button class="btn btn-info" onclick="loadPolls(${i}, '${search}', ${status})">${i}</button>`;
+                }
+            }
+
+            if (page < totalPages) {
+                pagination.innerHTML += `<button class="btn btn-info" onclick="loadPolls(${page + 1}, '${search}', ${status})">下一页</button>`;
+            }
+
+            pagination.innerHTML += `<span style="margin-left: 10px; color: #666;">共 ${total} 条记录</span>`;
+        }
+
+        function searchPolls() {
+            const search = document.getElementById('poll-search').value;
+            const status = parseInt(document.getElementById('poll-status').value);
+            loadPolls(1, search, status);
+        }
+
+        function showAddPollModal() {
+            document.getElementById('poll-modal-title').textContent = '创建投票';
+            document.getElementById('poll-id').value = '';
+            document.getElementById('poll-title').value = '';
+            document.getElementById('poll-description').value = '';
+            document.getElementById('poll-topic').value = '';
+            document.getElementById('poll-type').value = '0';
+            document.getElementById('poll-max-options').value = '1';
+            document.getElementById('poll-end-time').value = '';
+            document.getElementById('poll-is-active').checked = true;
+            document.getElementById('poll-options-list').innerHTML = `
+                <input type="text" class="poll-option" placeholder="选项1" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
+                <input type="text" class="poll-option" placeholder="选项2" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">
+            `;
+            document.getElementById('poll-modal').style.display = 'flex';
+        }
+
+        function showEditPollModal(id) {
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_polls.php?page=1&limit=100', { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    const poll = data.data.find(p => p.id === id);
+                    if (!poll) {
+                        alert('投票不存在');
+                        return;
+                    }
+                    document.getElementById('poll-modal-title').textContent = '编辑投票';
+                    document.getElementById('poll-id').value = poll.id;
+                    document.getElementById('poll-title').value = poll.title;
+                    document.getElementById('poll-description').value = poll.description || '';
+                    document.getElementById('poll-topic').value = poll.topic || '';
+                    document.getElementById('poll-type').value = poll.is_multiple ? '1' : '0';
+                    document.getElementById('poll-max-options').value = poll.max_options || '1';
+                    document.getElementById('poll-end-time').value = poll.end_time ? poll.end_time.replace(' ', 'T') : '';
+                    document.getElementById('poll-is-active').checked = poll.is_active;
+                    
+                    let optionsHtml = '';
+                    poll.options.forEach(opt => {
+                        optionsHtml += `<input type="text" class="poll-option" value="${opt.option_text}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;">`;
+                    });
+                    document.getElementById('poll-options-list').innerHTML = optionsHtml;
+                    
+                    document.getElementById('poll-modal').style.display = 'flex';
+                });
+        }
+
+        function closePollModal() {
+            document.getElementById('poll-modal').style.display = 'none';
+        }
+
+        function addPollOption() {
+            const list = document.getElementById('poll-options-list');
+            const count = list.querySelectorAll('.poll-option').length;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'poll-option';
+            input.placeholder = '选项' + (count + 1);
+            input.required = true;
+            input.style = 'width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 5px;';
+            list.appendChild(input);
+        }
+
+        document.getElementById('poll-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('poll-id').value;
+            const options = Array.from(document.querySelectorAll('.poll-option')).map(input => input.value);
+            
+            const data = {
+                action: id ? 'edit' : 'create',
+                title: document.getElementById('poll-title').value,
+                description: document.getElementById('poll-description').value,
+                topic: document.getElementById('poll-topic').value,
+                is_multiple: parseInt(document.getElementById('poll-type').value),
+                max_options: parseInt(document.getElementById('poll-max-options').value),
+                end_time: document.getElementById('poll-end-time').value || null,
+                is_active: document.getElementById('poll-is-active').checked ? 1 : 0,
+                options: options
+            };
+
+            if (id) {
+                data.id = parseInt(id);
+            }
+
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    closePollModal();
+                    loadPolls(pollPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        });
+
+        function deletePoll(id) {
+            if (!confirm('确定要删除该投票吗？删除后将无法恢复！')) {
+                return;
+            }
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'delete', id: id })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadPolls(pollPage);
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败');
+            });
+        }
+
+        function togglePollActive(id) {
+            const baseUrl = window.location.origin;
+            fetch(baseUrl + '/api/admin_polls.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'toggle_active', id: id })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadPolls(pollPage);
                 } else {
                     alert(result.message);
                 }
