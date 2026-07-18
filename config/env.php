@@ -23,5 +23,5 @@ class Env {
     }
 }
 
-Env::load();
+Env::load(dirname(__DIR__) . '/.env');
 ?>
