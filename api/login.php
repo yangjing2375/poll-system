@@ -62,6 +62,8 @@ try {
             $_SESSION['admin_username'] = $admin['username'];
             $_SESSION['is_admin'] = true;
             
+            Logger::info('管理员登录成功', ['username' => $admin['username'], 'ip' => $_SERVER['REMOTE_ADDR']]);
+            
             echo json_encode([
                 'status' => 'success',
                 'message' => '登录成功',
@@ -74,18 +76,22 @@ try {
             ]);
             exit;
         } else {
+            Logger::warning('管理员登录失败', ['username' => $username, 'ip' => $_SERVER['REMOTE_ADDR']]);
             echo json_encode(['status' => 'error', 'message' => '用户名或密码错误']);
             exit;
         }
     }
 
     if (!password_verify($password, $user['password'])) {
+        Logger::warning('用户登录失败', ['username' => $username, 'ip' => $_SERVER['REMOTE_ADDR']]);
         echo json_encode(['status' => 'error', 'message' => '用户名或密码错误']);
         exit;
     }
 
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
+
+    Logger::info('用户登录成功', ['username' => $user['username'], 'ip' => $_SERVER['REMOTE_ADDR']]);
 
     echo json_encode([
         'status' => 'success',
@@ -98,6 +104,7 @@ try {
         'is_admin' => false
     ]);
 } catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => '登录失败: ' . $e->getMessage()]);
+    Logger::error('登录异常', ['error' => $e->getMessage(), 'username' => $username]);
+    echo json_encode(['status' => 'error', 'message' => '登录失败']);
 }
 ?>

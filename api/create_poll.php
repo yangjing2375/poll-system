@@ -74,6 +74,13 @@ try {
     
     $db->commit();
     
+    Logger::info('投票创建成功', [
+        'poll_id' => $pollId, 
+        'title' => $data['title'], 
+        'creator_id' => $creator_id,
+        'option_type' => $data['option_type'] ?? 'text'
+    ]);
+    
     echo json_encode([
         'success' => true,
         'message' => '投票创建成功',
@@ -81,6 +88,7 @@ try {
     ]);
 } catch (PDOException $e) {
     $db->rollBack();
-    echo json_encode(['success' => false, 'message' => '创建失败: ' . $e->getMessage()]);
+    Logger::error('投票创建失败', ['title' => $data['title'], 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => '创建失败']);
 }
 ?>
