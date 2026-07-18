@@ -13,6 +13,12 @@
 | 管理员 | admin | password |
 | 普通用户 | 嘻嘻 | 123456 |
 
+### 📺 演示视频
+
+由于视频文件较大，已上传至百度网盘：  
+[在线投票系统演示视频.mp4](https://pan.baidu.com/s/1PF-s5MurfI2NwFPvjGHCpw?pwd=djk6)  
+提取码：`djk6`
+
 ## 功能特性
 
 ### 用户功能
