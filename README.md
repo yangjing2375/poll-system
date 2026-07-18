@@ -100,9 +100,15 @@ poll-system/
 │   ├── env.php           # 环境变量加载器
 │   └── logger.php        # 日志工具类
 ├── docs/                 # 项目文档
-│   ├── api.md            # API接口文档
-│   └── prompt_log.md     # AI交互日志
+│   ├── api.md                  # API接口文档
+│   ├── prompt_log.md           # AI交互日志
+│   ├── AI_Code_Review.md       # AI代码审查报告
+│   └── 个人实训总结报告.md      # 个人实训总结报告
 ├── logs/                 # 日志文件目录
+├── screenshots/          # 截图资源
+│   ├── db_structure.png        # 数据库表结构截图
+│   ├── api_get_polls.png       # API接口测试截图
+│   └── api_topics_stats.png    # 专题统计接口截图
 ├── sql/                  # SQL脚本
 │   └── create_tables.sql # 完整建表脚本
 ├── static/               # 静态资源
