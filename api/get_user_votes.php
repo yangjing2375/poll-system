@@ -59,6 +59,7 @@ try {
     
     echo json_encode(['success' => true, 'data' => $result]);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => '获取投票记录失败: ' . $e->getMessage()]);
+    Logger::error('获取投票记录失败', ['error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => '获取投票记录失败']);
 }
 ?>

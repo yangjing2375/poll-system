@@ -30,14 +30,14 @@ try {
     ");
     $stmt->execute([$poll_id]);
     $poll = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($poll['is_anonymous'] && !$is_admin) {
-        $poll['creator_name'] = '匿名用户';
-    }
-    
+
     if (!$poll) {
         echo json_encode(['success' => false, 'message' => '投票不存在']);
         exit;
+    }
+
+    if ($poll['is_anonymous'] && !$is_admin) {
+        $poll['creator_name'] = '匿名用户';
     }
     
     $stmt = $db->prepare("
@@ -79,6 +79,7 @@ try {
         ]
     ]);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => '获取投票结果失败: ' . $e->getMessage()]);
+    Logger::error('获取投票结果失败', ['error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => '获取投票结果失败']);
 }
 ?>

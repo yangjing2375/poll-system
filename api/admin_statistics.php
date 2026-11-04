@@ -40,13 +40,13 @@ try {
                 echo json_encode([
                     'status' => 'success',
                     'data' => [
-                        'total_users' => $totalUsers,
-                        'total_admins' => $totalAdmins,
-                        'total_polls' => $totalPolls,
-                        'active_polls' => $activePolls,
-                        'hot_polls' => $hotPolls,
-                        'total_votes' => $totalVotes,
-                        'total_voters' => $totalVoters
+                        'total_users' => (int)$totalUsers,
+                        'total_admins' => (int)$totalAdmins,
+                        'total_polls' => (int)$totalPolls,
+                        'active_polls' => (int)$activePolls,
+                        'hot_polls' => (int)$hotPolls,
+                        'total_votes' => (int)$totalVotes,
+                        'total_voters' => (int)$totalVoters
                     ]
                 ]);
                 break;
@@ -149,6 +149,7 @@ try {
         echo json_encode(['status' => 'error', 'message' => '方法不支持']);
     }
 } catch (Exception $e) {
-    echo json_encode(['status' => 'error', 'message' => '服务器错误: ' . $e->getMessage()]);
+    Logger::error('统计数据查询失败', ['error' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => '统计数据查询失败']);
 }
 ?>

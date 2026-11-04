@@ -12,8 +12,8 @@ try {
     $db = getDB();
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $limit = isset($_GET['limit']) ? min(100, max(1, intval($_GET['limit']))) : 10;
         $offset = ($page - 1) * $limit;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         $status = isset($_GET['status']) ? intval($_GET['status']) : -1;
@@ -84,6 +84,17 @@ try {
                         exit;
                     }
 
+                    // 最大可选数不能超过有效选项数量，结束时间不能早于当前时间
+                    $maxOptions = !empty($input['is_multiple']) ? max(1, intval($input['max_options'] ?? 1)) : 1;
+                    if ($maxOptions > count($validOptions)) {
+                        echo json_encode(['status' => 'error', 'message' => '最大可选数不能超过选项数量']);
+                        exit;
+                    }
+                    if (!empty($input['end_time']) && strtotime($input['end_time']) < time()) {
+                        echo json_encode(['status' => 'error', 'message' => '结束时间不能早于当前时间']);
+                        exit;
+                    }
+
                     $db->beginTransaction();
                     
                     $stmt = $db->prepare("INSERT INTO polls (title, description, topic, creator_id, is_multiple, max_options, end_time, is_active, is_anonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -135,6 +146,17 @@ try {
 
                     if (count($validOptions) < 2) {
                         echo json_encode(['status' => 'error', 'message' => '至少需要两个有效的投票选项']);
+                        exit;
+                    }
+
+                    // 最大可选数不能超过有效选项数量，结束时间不能早于当前时间
+                    $maxOptions = !empty($input['is_multiple']) ? max(1, intval($input['max_options'] ?? 1)) : 1;
+                    if ($maxOptions > count($validOptions)) {
+                        echo json_encode(['status' => 'error', 'message' => '最大可选数不能超过选项数量']);
+                        exit;
+                    }
+                    if (!empty($input['end_time']) && strtotime($input['end_time']) < time()) {
+                        echo json_encode(['status' => 'error', 'message' => '结束时间不能早于当前时间']);
                         exit;
                     }
 
@@ -213,9 +235,10 @@ try {
         echo json_encode(['status' => 'error', 'message' => '方法不支持']);
     }
 } catch (Exception $e) {
-    if (isset($db)) {
+    if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
-    echo json_encode(['status' => 'error', 'message' => '服务器错误: ' . $e->getMessage()]);
+    Logger::error('管理员投票管理失败', ['error' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => '操作失败，请稍后重试']);
 }
 ?>

@@ -41,6 +41,25 @@ if (count($validOptions) < 2) {
     exit;
 }
 
+$is_multiple = !empty($data['is_multiple']) ? 1 : 0;
+$max_options = $is_multiple ? intval($data['max_options'] ?? 1) : 1;
+
+// 最大可选数必须落在 1 与选项数量之间
+if ($max_options < 1) {
+    echo json_encode(['success' => false, 'message' => '最大可选数至少为 1']);
+    exit;
+}
+if ($max_options > count($validOptions)) {
+    echo json_encode(['success' => false, 'message' => '最大可选数不能超过选项数量']);
+    exit;
+}
+
+// 结束时间必须晚于当前时间
+if (!empty($data['end_time']) && strtotime($data['end_time']) < time()) {
+    echo json_encode(['success' => false, 'message' => '结束时间不能早于当前时间']);
+    exit;
+}
+
 try {
     $db = getDB();
     $db->beginTransaction();
@@ -51,8 +70,8 @@ try {
             $data['description'] ?? '',
             $data['topic'] ?? '',
             $creator_id,
-            $data['is_multiple'] ?? 0,
-            $data['max_options'] ?? 1,
+            $is_multiple,
+            $max_options,
             $data['end_time'] ?? null,
             $data['is_anonymous'] ?? 0,
             $data['option_type'] ?? 'text'

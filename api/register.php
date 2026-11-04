@@ -71,6 +71,7 @@ try {
         ]
     ]);
 } catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => '注册失败: ' . $e->getMessage()]);
+    Logger::error('注册失败', ['error' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => '注册失败，请稍后重试']);
 }
 ?>

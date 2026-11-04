@@ -5,15 +5,15 @@ setCORSHeaders();
 
 try {
     if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-        echo json_encode(['status' => 'error', 'message' => '无权限访问', 'session' => $_SESSION]);
+        echo json_encode(['status' => 'error', 'message' => '无权限访问']);
         exit;
     }
 
     $db = getDB();
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $limit = isset($_GET['limit']) ? min(100, max(1, intval($_GET['limit']))) : 10;
         $offset = ($page - 1) * $limit;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
@@ -125,6 +125,7 @@ try {
         echo json_encode(['status' => 'error', 'message' => '方法不支持']);
     }
 } catch (Exception $e) {
-    echo json_encode(['status' => 'error', 'message' => '服务器错误: ' . $e->getMessage()]);
+    Logger::error('管理员用户管理失败', ['error' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => '操作失败，请稍后重试']);
 }
 ?>

@@ -26,7 +26,9 @@ if ($file['error'] !== UPLOAD_ERR_OK) {
 }
 
 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-if (!in_array($file['type'], $allowedTypes)) {
+$imageInfo = @getimagesize($file['tmp_name']);
+$detectedType = $imageInfo ? image_type_to_mime_type($imageInfo[2]) : '';
+if (!in_array($detectedType, $allowedTypes)) {
     echo json_encode(['status' => 'error', 'message' => '只支持JPG、PNG、GIF、WebP格式']);
     exit;
 }

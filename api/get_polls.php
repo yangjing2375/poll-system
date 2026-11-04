@@ -26,6 +26,10 @@ try {
         $sql .= " AND p.topic = ?";
         $params[] = $topic;
     }
+
+    if (!empty($_GET['is_hot'])) {
+        $sql .= " AND p.is_hot = 1";
+    }
     
     if ($keyword) {
         $sql .= " AND (p.title LIKE ? OR p.description LIKE ?)";
@@ -74,6 +78,7 @@ try {
     
     echo json_encode(['success' => true, 'data' => $polls]);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => '获取投票列表失败: ' . $e->getMessage()]);
+    Logger::error('获取投票列表失败', ['error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => '获取投票列表失败']);
 }
 ?>
