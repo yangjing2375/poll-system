@@ -6,3 +6,6 @@ node_modules/
 *.tmp
 Thumbs.db
 *.pdf
+.phpunit.cache/
+.phpunit.result.cache
+~$*
