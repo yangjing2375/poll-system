@@ -1,0 +1,19 @@
+{
+    "name": "yangjing/poll-system",
+    "description": "在线投票系统（PHP + MySQL），包含接口自动化测试",
+    "type": "project",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/Support/"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit --testdox"
+    }
+}
