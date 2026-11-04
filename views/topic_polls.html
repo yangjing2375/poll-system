@@ -553,15 +553,23 @@
                 }
                 
                 const options = data.data.options;
+                const optionType = data.data.poll.option_type || 'text';
                 let html = '';
                 
                 options.forEach(option => {
+                    let optionContent = '';
+                    if (optionType === 'image' && option.option_image) {
+                        optionContent = `
+                            <img src="${option.option_image}" alt="${option.option_text}" class="option-image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 12px;">
+                        `;
+                    }
                     html += `
                         <div class="modal-option">
                             <input type="${isMultiple ? 'checkbox' : 'radio'}" 
                                    name="poll-${pollId}" 
                                    id="option-${option.id}"
                                    value="${option.id}">
+                            ${optionContent}
                             <span class="option-text">${option.option_text}</span>
                         </div>
                     `;

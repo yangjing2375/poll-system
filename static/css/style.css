@@ -713,3 +713,31 @@ button:active {
 .form-check label {
     margin-bottom: 0;
 }
+.modal-option {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.modal-option input[type="radio"],
+.modal-option input[type="checkbox"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+}
+
+.modal-option .option-text {
+    flex: 1;
+    font-size: 15px;
+}
+
+.modal-option img.option-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 12px;
+}
