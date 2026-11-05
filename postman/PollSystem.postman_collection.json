@@ -306,7 +306,7 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "const j = pm.response.json();",
-                  "pm.test(\"仅返回热门投票\", () => { pm.expect(j.success).to.eql(true); pm.expect(j.data.length).to.be.above(0); j.data.forEach(p => pm.expect(p.is_hot).to.eql(1)); });"
+                  "pm.test(\"仅返回热门投票\", () => { pm.expect(j.success).to.eql(true); pm.expect(j.data.length).to.be.above(0); j.data.forEach(p => pm.expect(String(p.is_hot)).to.eql(\"1\")); });"
                 ]
               }
             }
